@@ -1,0 +1,70 @@
+\contentsline {section}{\numberline {1}Mathematical Model of PMSMs}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}$abc$ Frame}{3}{subsection.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.1}Equivalent Circuit Model}{3}{subsubsection.1.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.2}Flux Linkages}{4}{subsubsection.1.1.2}%
+\contentsline {paragraph}{Winding Inductances}{4}{paragraph*.3}%
+\contentsline {paragraph}{Permanent Magnet Flux Linkage}{11}{paragraph*.4}%
+\contentsline {paragraph}{Summary}{13}{paragraph*.5}%
+\contentsline {subsubsection}{\numberline {1.1.3}Back-EMF}{14}{subsubsection.1.1.3}%
+\contentsline {subsubsection}{\numberline {1.1.4}PMSM Equations in $abc$ Frame}{15}{subsubsection.1.1.4}%
+\contentsline {paragraph}{Summary}{15}{paragraph*.6}%
+\contentsline {subsection}{\numberline {1.2}$\alpha \beta $ Frame}{16}{subsection.1.2}%
+\contentsline {subsubsection}{\numberline {1.2.1}Clarke Transformation}{19}{subsubsection.1.2.1}%
+\contentsline {paragraph}{Construction of the $\alpha $-Axis}{20}{paragraph*.11}%
+\contentsline {paragraph}{Construction of the $\beta $-Axis}{21}{paragraph*.13}%
+\contentsline {paragraph}{Power-Invariant Clarke Transformation}{22}{paragraph*.15}%
+\contentsline {paragraph}{Amplitude-Invariant Clarke Transformation}{25}{paragraph*.16}%
+\contentsline {paragraph}{Geometric Interpretation}{30}{paragraph*.17}%
+\contentsline {subsubsection}{\numberline {1.2.2}PMSM Equations in $\alpha \beta $ Frame}{32}{subsubsection.1.2.2}%
+\contentsline {paragraph}{Summary}{35}{paragraph*.19}%
+\contentsline {subsection}{\numberline {1.3}dq Frame}{36}{subsection.1.3}%
+\contentsline {subsubsection}{\numberline {1.3.1}Park Transformation}{38}{subsubsection.1.3.1}%
+\contentsline {subsubsection}{\numberline {1.3.2}Transformation of the PMSM Model}{41}{subsubsection.1.3.2}%
+\contentsline {paragraph}{Voltage Equations in $dq$ Frame}{41}{paragraph*.21}%
+\contentsline {paragraph}{Flux Linkages in the $dq$ Frame}{43}{paragraph*.22}%
+\contentsline {subsubsection}{\numberline {1.3.3}PMSM Equations in $dq$ Frame}{46}{subsubsection.1.3.3}%
+\contentsline {paragraph}{Summary}{47}{paragraph*.23}%
+\contentsline {subsection}{\numberline {1.4}Electromechanical Model}{49}{subsection.1.4}%
+\contentsline {subsubsection}{\numberline {1.4.1}Electromechanical Power}{49}{subsubsection.1.4.1}%
+\contentsline {paragraph}{Resistive Loss}{51}{paragraph*.24}%
+\contentsline {paragraph}{Magnetic Energy}{52}{paragraph*.25}%
+\contentsline {paragraph}{Electromagnetic Torque}{52}{paragraph*.26}%
+\contentsline {subsubsection}{\numberline {1.4.2}Mechanical Model}{54}{subsubsection.1.4.2}%
+\contentsline {subsection}{\numberline {1.5}Complete PMSM Model}{55}{subsection.1.5}%
+\contentsline {subsubsection}{\numberline {1.5.1}Model Assumptions}{55}{subsubsection.1.5.1}%
+\contentsline {subsubsection}{\numberline {1.5.2}Reference-Frame Relationships}{55}{subsubsection.1.5.2}%
+\contentsline {paragraph}{Clarke Transformation}{55}{paragraph*.27}%
+\contentsline {paragraph}{Park Transformation}{56}{paragraph*.28}%
+\contentsline {paragraph}{Angle \& Speed Relationships}{56}{paragraph*.29}%
+\contentsline {subsubsection}{\numberline {1.5.3}Electrical Model}{56}{subsubsection.1.5.3}%
+\contentsline {subsubsection}{\numberline {1.5.4}Electromagnetic Torque \& Mechanical Model}{57}{subsubsection.1.5.4}%
+\contentsline {subsubsection}{\numberline {1.5.5}State-Space Model}{57}{subsubsection.1.5.5}%
+\contentsline {section}{\numberline {2}Three-Phase Inverters \& Modulation Techniques}{58}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Three-Phase Voltage Source Inverter}{58}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}Inverter Switching Functions}{59}{subsubsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.2}Inverter Output Voltages}{60}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Inverter Pole Voltages}{60}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Phase Voltages}{60}{subsubsection.2.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.3}Line Voltages}{64}{subsubsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.3}Inverter Switching States \& Space Vectors}{65}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Pulse-Width Modulation}{68}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}Fast Averaged Signals}{68}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}PWM Signal Generation}{69}{subsubsection.2.4.2}%
+\contentsline {subsubsection}{\numberline {2.4.3}Fast Switching Appoximation}{72}{subsubsection.2.4.3}%
+\contentsline {subsection}{\numberline {2.5}Switching Vectors \& Time Averaging}{73}{subsection.2.5}%
+\contentsline {subsubsection}{\numberline {2.5.1}Average Vectors Between Switching States}{74}{subsubsection.2.5.1}%
+\contentsline {subsubsection}{\numberline {2.5.2}Acheivable Voltage Vectors}{76}{subsubsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.6}Sinusoidal Pulse Width Modulation (SPWM)}{77}{subsection.2.6}%
+\contentsline {subsubsection}{\numberline {2.6.1}SPWM Limitations}{80}{subsubsection.2.6.1}%
+\contentsline {subsubsection}{\numberline {2.6.2}Practical Implemention of SPWM}{81}{subsubsection.2.6.2}%
+\contentsline {subsection}{\numberline {2.7}Third Harmonic Injection}{83}{subsection.2.7}%
+\contentsline {subsubsection}{\numberline {2.7.1}Common-Mode Voltage Injection}{84}{subsubsection.2.7.1}%
+\contentsline {subsubsection}{\numberline {2.7.2}Third Harmonic Voltage Injection}{88}{subsubsection.2.7.2}%
+\contentsline {subsubsection}{\numberline {2.7.3}Practical Implemention of Third Harmonic Injection}{93}{subsubsection.2.7.3}%
+\contentsline {subsection}{\numberline {2.8}Space Vector Pulse-Width Modulation (SVPWM)}{94}{subsection.2.8}%
+\contentsline {subsubsection}{\numberline {2.8.1}Sector-Based SVPWM}{94}{subsubsection.2.8.1}%
+\contentsline {subsubsection}{\numberline {2.8.2}Zero-Vector Distribution}{100}{subsubsection.2.8.2}%
+\contentsline {subsubsection}{\numberline {2.8.3}Space Vector Modulation}{101}{subsubsection.2.8.3}%
+\contentsline {subsubsection}{\numberline {2.8.4}Common-Mode Injection SVPWM}{103}{subsubsection.2.8.4}%
+\contentsline {subsubsection}{\numberline {2.8.5}Practical Implementation of SVPWM}{106}{subsubsection.2.8.5}%
+\contentsline {section}{\numberline {A.}Optimization of Third Harmonic Injection}{107}{appendix.A}%

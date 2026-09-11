@@ -1,0 +1,319 @@
+\section{Optimization of Third Harmonic Injection}
+\label{app:thi-optimiazation}
+
+This appendix section derives the optimal amplitude of the third harmonic component used in third-harmonic injection (THI). The objective is to determine the injection amplitude that minimizes the peak magnitude of the resulting phase-voltage reference for a given fundamental amplitude. Minimizing this peak allows the fundamental component to be maximized while keeping the commanded inverter pole voltages within the DC-bus limits. The derivation shows that this occurs when the third-harmonic amplitude is one-sixth of the fundamental amplitude and opposite in sign. 
+
+Take the commanded phase-$a$ reference voltage:
+
+\begin{equation}
+    v_{ag}^* = \frac{V_{DC}}{2} + V_m\cos\theta_e + V_3\cos3\theta_e
+\end{equation}
+
+Since $V_{DC}/2$ is a DC offset, the maximum sinusoidal swing about the midpoint of the DC bus is determined entirely by the AC component. If we define $f(\theta_e)$ as:
+
+\begin{equation}
+    f(\theta) = V_m\cos\theta + V_3\cos3\theta
+\end{equation}
+
+To reduce the amplitude of the fundamental, the third harmonic is chosen opposite in sign to the fundamental near its peak. If we define:
+
+\begin{equation}
+    V_3 = -kV_m, \qquad
+    k \geq 0
+\end{equation}
+
+Then:
+
+\begin{equation}
+    f(\theta) = V_m(\cos\theta - k\cos3\theta)
+\end{equation}
+
+Since $V_m$ scales the entire waveform, define the normalized reference:
+
+\begin{equation}
+    F(\theta) = \frac{f(\theta)}{V_m} = \cos\theta - k\cos3\theta
+\end{equation}
+
+The objective is to determine $k$ such that the maximum magnitude of the normalize reference is minimized:
+
+\begin{equation}
+    \underset{k}{min}\left[ \underset{\theta}{\max}|F(\theta)| \right]
+\end{equation}
+
+This minimizes the required inverter pole voltage swing for a given fundamental amplitude, $V_m$. To determine the extrema of the waveform, we differentiate with respect to $\theta$:
+
+\begin{equation}
+    F'(\theta) = -\sin\theta + 3k\sin3\theta
+\end{equation}
+
+At a maximum:
+
+\begin{equation}
+    -\sin\theta + 3k\sin3\theta = 0
+\end{equation}
+
+Using the identity:
+
+\begin{equation}
+    \sin3\theta = 3\sin\theta - 4\sin^3\theta
+\end{equation}
+
+Collecting terms:
+
+\begin{equation}
+    \sin\theta[-1 + 9k -12k\sin^2\theta] = 0
+\end{equation}
+
+Hence, one set of extreme occurs at:\
+
+\begin{equation}
+    \sin\theta = 0
+\end{equation}
+
+Additional extrema satisfy:
+
+\begin{equation}
+    -1 + 9k - 12k\sin^2\theta = 0
+\end{equation}
+
+Therefore:
+
+\begin{equation}
+\label{eqn:max-locations}
+    \sin^2\theta = \frac{9k - 1}{12k}
+\end{equation}
+
+This equation only locates the off center extrema for a given $k$. These additional extrema exist only when:
+
+\begin{equation}
+    9k - 1 \geq 0
+\end{equation}
+
+Or:
+
+\begin{equation}
+    k \geq \frac{1}{9}
+\end{equation}
+
+Thus, $k = 1/9$ represents the point at which the original peak at $\theta = 0$ becomes locally flat and begins to split into two off center extrema. It does not, however, represent the minimum possible global peak. The effect of different $k$ values is illustrated in Figure \ref{fig:thi-k-values}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{thi-k-values.png}
+    \caption{$f(\theta)$ for $k = 0.2$ (Red), $k = 0.5$ (Orange), $k = 0.8$ (Blue)}
+    \label{fig:thi-k-values}
+\end{figure}
+
+To determine the value of $k$ that minimizes these new peaks, we begin with the triple angle identity. Recall $F(\theta)$:
+
+\begin{equation}
+    F(\theta) = \cos\theta - k\cos3\theta
+\end{equation}
+
+The triple angle identity is:
+
+\begin{equation}
+    \cos3\theta = 4\cos^3\theta - 3\cos\theta
+\end{equation}
+
+Let:
+
+\begin{equation}
+    x = \cos\theta
+\end{equation}
+
+Then:
+
+\begin{align}
+    F(x) &= x - k(4x^3 - 3x) \\
+    &= (1 + 3k)x - 3kx^3
+\end{align}
+
+Differentiating with respect to $x$:
+
+\begin{equation}
+    F'(x) = 1 + 3k - 12kx^2 
+\end{equation}
+
+At an off center maximum:
+
+\begin{equation}
+    1 + 3k - 12kx^2 = 0
+\end{equation}
+
+And therefore:
+
+\begin{equation}
+\label{eqn:max-location1}
+    x^2 = \frac{1 + 3k}{12k}
+\end{equation}
+
+This equation locates the extrema and is equivalent to Equation \ref{eqn:max-locations}. One use a $\cos\theta$ substitution, and the other uses a $\sin\theta$ substitution. For the postiive maximum:
+
+\begin{equation}
+\label{eqn:max-location2}
+    x = \sqrt{\frac{1 + 3k}{12k}}
+\end{equation}
+
+The magnitude of the corresponding peak can now be obtained by substituting this into:
+
+\begin{equation}
+    F(x) = (1 + 3k)x - 3kx^3
+\end{equation}
+
+From the extreme condition, Equation \ref{eqn:max-location1}:
+
+\begin{equation}
+    12kx^2 = 1 + 3k
+\end{equation}
+
+And therefore:
+
+\begin{equation}
+    4kx^2 = \frac{1 + 3k}{3}
+\end{equation}
+
+Factoring $x$ from $F(x)$:
+
+\begin{equation}
+    F_{pk} = x\left[(1 + 3k) - \frac{1 + 3k}{3}\right]
+\end{equation}
+
+Substituting Equation \ref{eqn:max-location2}, the equation for the location of the extremum:
+
+\begin{equation}
+    F_{pk} = \frac{2}{3}(1 + 3k)x
+\end{equation}
+
+Recall Equation \ref{eqn:max-location2}:
+
+\begin{equation}
+    x = \sqrt{\frac{1 + 3k}{12k}}
+\end{equation}
+
+The peak becomes:
+
+\begin{equation}
+    F_{pk} = \frac{2}{3}(1 + 3k)\sqrt{\frac{1 + 3k}{12k}}
+\end{equation}
+
+Simplifying:
+
+\begin{equation}
+    F_{pk}(k) = \frac{(1 + 3k)^{3/2}}{3\sqrt{3k}}
+\end{equation}
+
+The optimum third harmonic amplitude is obtained by minimizing this expression with respect to $k$. Because $F_{pk} > 0$, it is convenient to minimize its square:
+
+\begin{equation}
+    F_{pk}^2 = \frac{(1 + 3k)^2}{27k}
+\end{equation}
+
+Differentiating directly with respect to $k$:
+
+\begin{align}
+    \frac{dF_{pk}^2}{dk} 
+    &= \frac{27k[9(1 + 3k)^2] - 27(1 + 3k)^3}{(27k)^2} \\[6pt]
+    &= \frac{(1 + 3k)^2[9k - (1 + 3k)]}{27k^2} \\[6pt]
+    &= \frac{(1 + 3k)^2(6k - 1)}{27k^2}
+\end{align}
+
+The minimum occurs when:
+
+\begin{equation}
+    \frac{dF_{pk}^2}{dk} = 0
+\end{equation}
+
+Since $k > 0$, the denominator is nonzero, and $1 + 3k > 0$. Therefore the only relevant solution is:
+
+\begin{equation}
+    6k - 1 = 0
+\end{equation}
+
+Giving, alas:
+
+\begin{equation}
+    k = \frac{1}{6}
+\end{equation}
+
+Finally, recalling that:
+
+\begin{equation}
+    V_3 = -kV_m
+\end{equation}
+
+The optimum third harmonic amplitude is:
+
+\begin{equation}
+    \boxed{V_3 = -\frac{V_m}{6}}
+\end{equation}
+
+Lastly, we find the angle at which $F(\theta)$ reaches its maximum. Beginning with:
+
+\begin{equation}
+    F(\theta) = \cos\theta - \frac{1}{6}\cos3\theta
+\end{equation}
+
+The maximum occurs when the derivative is zero:
+
+\begin{equation}
+    F'(\theta) = -\sin\theta + \frac{1}{2}sin3\theta = 0
+\end{equation}
+
+Using the identity:
+
+\begin{equation}
+    \sin3\theta = 3\sin\theta - 4\sin^3\theta
+\end{equation}
+
+Gives:
+
+\begin{equation}
+    -\sin\theta + \frac{1}{2}(3\sin\theta - 4sin^3\theta) = 0
+\end{equation}
+
+Therefore:
+
+\begin{equation}
+    \sin\theta\left(\frac{1}{2} - 2\sin^2\theta\right) = 0
+\end{equation}
+
+Thus:
+
+\begin{equation}
+    \sin\theta = 0 
+\end{equation}
+
+Or:
+
+\begin{equation}
+    \sin^2\theta = \frac{1}{4}
+\end{equation}
+
+For the positive half cycle, the extrema occur at:
+
+\begin{equation}
+    \theta = 0, \qquad
+    \theta = \frac{\pi}{6}, \qquad
+    \theta = \frac{5\pi}{6}, \qquad
+    \theta = \pi
+\end{equation}
+
+Evaluating at these values for $\theta$, we find that the maximum occurs at $\theta = \pi/6$:
+
+\begin{equation}
+    |F(\theta)|_{max} = F(\frac{\pi}{6}) = \cos\frac{\pi}{6} - \frac{1}{6}\cos\frac{\pi}{2} = \frac{\sqrt{3}}{2} \approx 0.8660
+\end{equation}
+
+Since $F(\theta)$ is a normalized waveform:
+
+\begin{equation}
+    f(\theta) = V_mF(\theta)
+\end{equation}
+
+We get:
+
+\begin{equation}
+    |f(\theta)|_{max} = \frac{\sqrt{3}}{2}V_m, \qquad
+    \theta = \frac{\pi}{6}
+\end{equation}
