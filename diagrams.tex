@@ -1,0 +1,468 @@
+\documentclass[12pt]{article}
+
+% ============================================================
+% Packages
+% ============================================================
+
+\usepackage[margin=1in]{geometry}
+\usepackage{float}
+\usepackage{circuitikz}
+
+% Optional: removes paragraph indentation
+\setlength{\parindent}{0pt}
+
+% ============================================================
+% Document
+% ============================================================
+
+\begin{document}
+
+%=========================================================================%
+
+% Three phase BJT inverter drawing
+
+%=========================================================================%
+
+\begin{figure}[H]
+
+\begin{center}
+
+\begin{circuitikz}[line width=0.8pt]
+
+% ============================================================
+% 3-Phase BJT Inverter
+% ============================================================
+
+% Phase A
+
+\node[npn]
+    (S1) at (0,3) {};
+
+\node[npn]
+    (S4) at (0,0) {};
+
+
+% Phase B
+
+\node[npn]
+    (S2) at (4,3) {};
+
+\node[npn]
+    (S5) at (4,0) {};
+
+
+% Phase C
+
+\node[npn]
+    (S3) at (8,3) {};
+
+\node[npn]
+    (S6) at (8,0) {};
+
+
+% ============================================================
+% DC+ BUS
+% ============================================================
+
+\draw
+(S1.C) -- ++(0,0.7)
+coordinate (Aplus)
+node[circ] {};
+
+\draw
+(S2.C) -- ++(0,0.7)
+coordinate (Bplus)
+node[circ] {};
+
+\draw
+(S3.C) -- ++(0,0.7)
+coordinate (Cplus);
+
+\draw
+(Aplus) -- (Cplus);
+
+
+% ============================================================
+% SWITCH NODES / PHASE OUTPUTS
+% ============================================================
+
+% Phase A
+
+\draw
+(S1.E) -- (S4.C);
+
+\coordinate (PhaseA) at ($(S1.E)!0.5!(S4.C)$);
+
+\draw
+(PhaseA)
+node[circ] {}
+-- ++(1.2,0)
+node[circ] {};
+
+
+% Phase B
+
+\draw
+(S2.E) -- (S5.C);
+
+\coordinate (PhaseB) at ($(S2.E)!0.5!(S5.C)$);
+
+\draw
+(PhaseB)
+node[circ] {}
+-- ++(1.2,0)
+node[circ] {};
+
+
+% Phase C
+
+\draw
+(S3.E) -- (S6.C);
+
+\coordinate (PhaseC) at ($(S3.E)!0.5!(S6.C)$);
+
+\draw
+(PhaseC)
+node[circ] {}
+-- ++(1.2,0)
+node[circ] {};
+
+
+% ============================================================
+% DC- BUS
+% ============================================================
+
+\draw
+(S4.E) -- ++(0,-0.7)
+coordinate (Agnd)
+node[circ] {};
+
+\draw
+(S5.E) -- ++(0,-0.7)
+coordinate (Bgnd)
+node[circ] {};
+
+\draw
+(S6.E) -- ++(0,-0.7)
+coordinate (Cgnd);
+
+\draw
+(Agnd) -- (Cgnd);
+
+
+% ============================================================
+% DIODE STYLE
+% ============================================================
+
+\ctikzset{diodes/scale=0.4}
+
+
+% ============================================================
+% FREEWHEEL DIODES
+% ============================================================
+
+% Phase A
+
+\draw
+(S1.E)
+node[circ] {}
+-- ++(0.45,0)
+to[D*] ($(S1.C)+(0.45,0)$)
+-- (S1.C)
+node[circ] {};
+
+\draw
+(S4.E)
+node[circ] {}
+-- ++(0.45,0)
+to[D*] ($(S4.C)+(0.45,0)$)
+-- (S4.C)
+node[circ] {};
+
+
+% Phase B
+
+\draw
+(S2.E)
+node[circ] {}
+-- ++(0.45,0)
+to[D*] ($(S2.C)+(0.45,0)$)
+-- (S2.C)
+node[circ] {};
+
+\draw
+(S5.E)
+node[circ] {}
+-- ++(0.45,0)
+to[D*] ($(S5.C)+(0.45,0)$)
+-- (S5.C)
+node[circ] {};
+
+
+% Phase C
+
+\draw
+(S3.E)
+node[circ] {}
+-- ++(0.45,0)
+to[D*] ($(S3.C)+(0.45,0)$)
+-- (S3.C)
+node[circ] {};
+
+\draw
+(S6.E)
+node[circ] {}
+-- ++(0.45,0)
+to[D*] ($(S6.C)+(0.45,0)$)
+-- (S6.C)
+node[circ] {};
+
+
+% ============================================================
+% DC-LINK CAPACITOR
+% ============================================================
+
+\coordinate (DCtop) at ($(Aplus)+(-3.6,0)$);
+\coordinate (DCbottom) at ($(Agnd)+(-3.6,0)$);
+
+
+% ------------------------------------------------------------
+% Extend DC buses to capacitor connection points
+% ------------------------------------------------------------
+
+\draw
+(Aplus) -- (DCtop)
+node[circ] {};
+
+\draw
+(Agnd) -- (DCbottom)
+node[circ] {};
+
+
+% ------------------------------------------------------------
+% Add left-side DC terminals
+% ------------------------------------------------------------
+
+\draw
+(DCtop)
+-- ++(-1.8,0)
+node[circ] {};
+
+\draw
+(DCbottom)
+-- ++(-1.8,0)
+node[circ] {};
+
+
+% ------------------------------------------------------------
+% DC-link capacitor
+% ------------------------------------------------------------
+
+\draw
+(DCtop)
+to[C]
+(DCbottom);
+
+
+\end{circuitikz}
+
+\end{center}
+
+\caption{Three-Phase Voltage Source Inverter Bridge}
+
+\label{fig:3p-VSI}
+
+\end{figure}
+
+
+
+
+
+
+
+
+
+\begin{figure}[H]
+\centering
+
+\begin{circuitikz}[line width=0.8pt]
+
+% ============================================================
+% THREE-PHASE INVERTER BLOCK
+% ============================================================
+
+\draw
+(0,0) rectangle (2.4,4.8);
+
+\node[align=center] at (1.2,2.4)
+{Three-Phase\\Voltage Source\\Inverter};
+
+
+% ============================================================
+% INVERTER OUTPUT TERMINALS
+% ============================================================
+
+\coordinate (Va) at (2.4,3.6);
+\coordinate (Vb) at (2.4,2.4);
+\coordinate (Vc) at (2.4,1.2);
+
+% Output connection dots
+\node[circ] at (Va) {};
+\node[circ] at (Vb) {};
+\node[circ] at (Vc) {};
+
+
+% ============================================================
+% STAR-CONNECTED LOAD COORDINATES
+% ============================================================
+
+% Neutral/star point
+\coordinate (N) at (7.0,2.0);
+
+% Phase winding outer terminals
+\coordinate (A) at (7.0,4.3);
+\coordinate (B) at (9.2,0.9);
+\coordinate (C) at (4.8,0.9);
+
+
+% ============================================================
+% WIRES FROM INVERTER TO LOAD
+% ============================================================
+
+% Phase A
+\draw
+(Va)
+-- ++(2.0,0)
+|- (A);
+
+% Phase B
+\draw
+(Vb)
+-- ++(1.2,0)
+|- (B);
+
+% Phase C
+\draw
+(Vc)
+-- ++(0.8,0)
+|- (C);
+
+
+% ============================================================
+% PHASE OUTPUT LABELS
+% ============================================================
+
+\node[above right] at (Va) {$V_{ag}$};
+\node[above right] at (Vb) {$V_{bg}$};
+\node[above right] at (Vc) {$V_{cg}$};
+
+
+% ============================================================
+% STAR-CONNECTED PHASE WINDINGS
+% ============================================================
+
+% Phase A winding
+\draw
+(A)
+to[L]
+(N);
+
+% Phase B winding
+\draw
+(B)
+to[L]
+(N);
+
+% Phase C winding
+\draw
+(C)
+to[L]
+(N);
+
+
+% ============================================================
+% STAR / NEUTRAL POINT
+% ============================================================
+
+\node[circ] at (N) {};
+
+
+% ============================================================
+% PHASE-TO-NEUTRAL VOLTAGE LABELS
+% ============================================================
+
+% Phase A
+\node[right] at ($(A)!0.45!(N)$)
+{$V_{an}$};
+
+\node[right] at ($(A)!0.12!(N)$)
+{$+$};
+
+\node[right] at ($(A)!0.82!(N)$)
+{$-$};
+
+
+% Phase B
+\node[above right] at ($(B)!0.45!(N)$)
+{$V_{bn}$};
+
+\node[below right] at ($(B)!0.15!(N)$)
+{$+$};
+
+\node[above left] at ($(B)!0.82!(N)$)
+{$-$};
+
+
+% Phase C
+\node[above left] at ($(C)!0.45!(N)$)
+{$V_{cn}$};
+
+\node[below left] at ($(C)!0.15!(N)$)
+{$+$};
+
+\node[above right] at ($(C)!0.82!(N)$)
+{$-$};
+
+
+% ============================================================
+% NEUTRAL VOLTAGE
+% ============================================================
+
+\draw
+(N)
+-- ++(0,-1.7)
+node[circ] {}
+node[right, midway] {$V_{ng}$};
+
+
+% ============================================================
+% GROUND REFERENCE
+% ============================================================
+
+\draw
+($(N)+(0,-1.7)$)
+-- ++(0,-0.4)
+node[ground] {};
+
+
+% ============================================================
+% DC- / REFERENCE RETURN FROM INVERTER
+% ============================================================
+
+\coordinate (InvGnd) at (1.2,0);
+
+\draw
+(InvGnd)
+-- ++(0,-2.1)
+-- ($(N)+(0,-2.1)$);
+
+\node[circ] at ($(N)+(0,-2.1)$) {};
+
+\end{circuitikz}
+
+\caption{Three-Phase Voltage Source Inverter Feeding a Y-Connected Load}
+
+\end{figure}
+
+
+\end{document}

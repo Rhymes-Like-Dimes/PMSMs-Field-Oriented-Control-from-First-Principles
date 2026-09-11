@@ -16,14 +16,17 @@
 \graphicspath{{images/}{./}}      % Image path
 \usepackage{caption, subcaption}  % Multiple figures
 \usepackage{float}                % Figure placement
+\usepackage{pdflscape}            % Landscape pages
 
 \usepackage{tikz}                 % Simple diagrams
-\usetikzlibrary{positioning}      %
+\usetikzlibrary{positioning}      % circuitz positioning
 
 \usepackage{titlesec}             % Custom section formatting
 \usepackage{hyperref}             % Clickable references and TOC
 
 \usepackage[american]{circuitikz} % Circuit diagrams
+\usepackage{fancyhdr}
+
 
 
 
@@ -4179,11 +4182,11 @@ The model developed in this chapter describes the response of the PMSM to an app
 
 
 %=========================================================================%
+\pagebreak
 \section{Three-Phase Inverters \& Modulation Techniques}
 \label{sec:three-phase-interters-and-modulation-techniques}
-%=========================================================================%
 
-%=========================================================================%
+
 \subsection{Three-Phase Voltage Source Inverter}
 \label{sec:three-phase-voltage-source-inverter}
 %=========================================================================%
@@ -4192,10 +4195,12 @@ The model developed in Chapter 1 describes the response of a PMSM to a set of th
 
 A conventional two-level, three-phase VSI consists of three half-bridge switching legs connected in parallel across a DC link, as shown in Figure \ref{fig:3p-VSI}. Each inverter leg supplies one phase of the motor and consists of an upper and lower semiconducting switch. For the controller considered here, these switches may be implemented using MOSFETs, IGBTs or increasingly, GaNFETs or SiCFETs. However, the following analysis is independent of the switching device used.
 
+%=========================================================================%
+
+% Three phase inverter drawing
 
 %=========================================================================%
-% Three phase inverter drawing
-%=========================================================================%
+
 \begin{figure}[H]
 \begin{center}
 \begin{circuitikz}[line width=0.8pt]
@@ -4204,27 +4209,104 @@ A conventional two-level, three-phase VSI consists of three half-bridge switchin
 % 3-Phase MOSFET Inverter
 % ============================================================
 
+\ctikzset{diodes/scale=0.35}
 \ctikzset{tripoles/mos style/arrows}
-\ctikzset{transistor bodydiode/relative thickness=0.6}
+\ctikzset{
+    transistor bodydiode/scale=0.1,
+    transistor bodydiode/color=black
+}
 
+% ============================================================
 % MOSFETs
+% ============================================================
+
 % Phase A
-\node[nigfete, bodydiode, bodydiode/.style={line width=0.5pt}]
-    (S1) at (0,3) {$S_1$};
-\node[nigfete, bodydiode, bodydiode/.style={line width=0.5pt}]
-    (S4) at (0,0) {$S_4$};
+\node[nigfete]
+    (S1) at (0,3) {};
+\node[right=16pt] at (S1.center) {$S_1$};
+
+\node[nigfete]
+    (S4) at (0,0) {};
+\node[right=16pt] at (S4.center) {$S_4$};
 
 % Phase B
-\node[nigfete, bodydiode, bodydiode/.style={line width=0.5pt}]
-    (S2) at (4,3) {$S_2$};
-\node[nigfete, bodydiode, bodydiode/.style={line width=0.5pt}]
-    (S5) at (4,0) {$S_5$};
+\node[nigfete]
+    (S2) at (4,3) {};
+\node[right=16pt] at (S2.center) {$S_2$};
+
+\node[nigfete]
+    (S5) at (4,0) {};
+\node[right=16pt] at (S5.center) {$S_5$};
 
 % Phase C
-\node[nigfete, bodydiode, bodydiode/.style={line width=0.5pt}]
-    (S3) at (8,3) {$S_3$};
-\node[nigfete, bodydiode, bodydiode/.style={line width=0.5pt}]
-    (S6) at (8,0) {$S_6$};
+\node[nigfete]
+    (S3) at (8,3) {};
+\node[right=16pt] at (S3.center) {$S_3$};
+
+\node[nigfete]
+    (S6) at (8,0) {};
+\node[right=16pt] at (S6.center) {$S_6$};
+
+
+% ============================================================
+% BODY DIODES
+% ============================================================
+
+% Phase A
+
+\draw
+(S1.S)
+node[circ] {}
+-- ++(0.45,0)
+to[D*] ($(S1.D)+(0.45,0)$)
+-- (S1.D)
+node[circ] {};
+
+\draw
+(S4.S)
+node[circ] {}
+-- ++(0.45,0)
+to[D*] ($(S4.D)+(0.45,0)$)
+-- (S4.D)
+node[circ] {};
+
+
+% Phase B
+
+\draw
+(S2.S)
+node[circ] {}
+-- ++(0.45,0)
+to[D*] ($(S2.D)+(0.45,0)$)
+-- (S2.D)
+node[circ] {};
+
+\draw
+(S5.S)
+node[circ] {}
+-- ++(0.45,0)
+to[D*] ($(S5.D)+(0.45,0)$)
+-- (S5.D)
+node[circ] {};
+
+
+% Phase C
+
+\draw
+(S3.S)
+node[circ] {}
+-- ++(0.45,0)
+to[D*] ($(S3.D)+(0.45,0)$)
+-- (S3.D)
+node[circ] {};
+
+\draw
+(S6.S)
+node[circ] {}
+-- ++(0.45,0)
+to[D*] ($(S6.D)+(0.45,0)$)
+-- (S6.D)
+node[circ] {};
 
 
 % ============================================================
@@ -4406,8 +4488,10 @@ coordinate (S6gate);
 
 \end{circuitikz}
 \end{center}
+
 \caption{Three-Phase Voltage Source Inverter Bridge}
 \label{fig:3p-VSI}
+
 \end{figure}
 
 The ultimate objective of the inverter is to produce the desired stator currents within the motor through a process known as \textit{modulation}. However, the stator currents cannot be commanded directly by the inverter. Instead, the inverter applies voltages across the motor windings, which cause the currents to evolve according to the electrical dynamics of the machine. Therefore, the immediate objective of the modulation scheme is to synthesize the appropriate stator voltages required to produce the desired stator currents.
@@ -6686,7 +6770,7 @@ This equation describes the outer edge of the hexagon, hence the maximum magnitu
     \underset{0 \leq \phi \leq \frac{\pi}{3}}{\max}(\cos(\frac{\pi}{6} - \phi))
 \end{equation}
 
-Typically, the maximum of a sinusoid is it's amplitude divided by two. However, for a phase shifted sinusoid over a finite domain, we cannot ensure the peak amplitude is reached in this domain. Thus, we take the derivative and equate it to zero. Let $f(\phi) = \cos(\frac{\pi}{6} - \phi)$, then:
+Typically, the maximum of a sinusoid is it's amplitude. However, for a phase shifted sinusoid over a finite domain, we cannot ensure the peak amplitude is reached in this domain. Thus, we take the derivative and equate it to zero. Let $f(\phi) = \cos(\frac{\pi}{6} - \phi)$, then:
 
 \begin{equation}
     f'(\phi) = \sin(\frac{\pi}{6} - \phi)
@@ -6730,7 +6814,7 @@ Where ideally, the fast average of a PWM signal closely approximates its referen
 \end{equation}
 
 %=========================================================================%
-\subsubsection{Zero-Vector Distribution}
+\paragraph{Zero-Vector Distribution}
 \label{sec:zero-vector-distribution}
 %=========================================================================%
 
@@ -6747,7 +6831,7 @@ As we have seen, a two-level, three-phase inverter possesses two switching state
     \mathbf{V}_7 = (111)
 \end{equation}
 
-Since both switching states produce the same voltage vector, the choice of how $T_0$ is distributed between them does not affect the average stator voltage vector synthesized over the switching period. However, the distribution and ordering of the zero and active vectors have an important effect on the switching behaviour of the inverter.
+Since both switching states produce the same voltage vector, the choice of how $T_0$ is distributed between them does not affect the average stator voltage vector synthesized over the switching period. However, the distribution and ordering of the zero and active vectors has an important effect on the switching behaviour of the inverter.
 
 For conventional symmetrical SVPWM, the zero-vector dwell time is divided equally between the two zero states and the switching sequence is arranged symmetrically about the center of the PWM period. For example, when the commanded voltage vector lies within Sector 1, the adjacent active vectors are $\mathbf{V}_1 = (100)$ and $\mathbf{V}_2 = (110)$. A symmetrical switching sequence may therefore be written as:
 
@@ -6763,9 +6847,9 @@ Or, in terms of the inverter switching states:
 
 Notice that this sequence is deliberately ordered such that only one inverter leg changes state during each transistion. For example, the transition from $000$ to $100$ requires only phase-$a$ to switch, while the subsequent transistion from $100$ to $110$ requires only phase-$b$ to switch. The same is true of $110$ to $111$ and the reverse sequence.
 
-Avoiding transistions in which multiple inverter legs switch simultaneously reduces switching losses, produces a predictable switching pattern, and reduces the electromagntic interference produced by the inverter associated with fast switching circuits. 
+Avoiding transistions in which multiple inverter legs switch simultaneously reduces switching losses, produces a predictable switching pattern, and reduces the electromagntic interference produced by fast switching circuits. 
 
-This symmetric sequence is suited particularly well to the center-aligned PWM scheme introduced in Section \ref{sec:pulse-width-modulation}. Rather than restarting the switching sequence at the end of the PWM period, the switching states reached as the timer counts upward are naturally traversed in reverse order as the timer counts downward. This is best illustrated in Figure \ref{fig:center-aligned-pwm2}, which shows the switching sequence for sector one described above. 
+This symmetric sequence is suited particularly well to the center-aligned PWM scheme introduced in Section \ref{sec:pulse-width-modulation}. Rather than restarting the switching sequence at the end of the PWM period, the switching states reached as the timer counts downward are naturally traversed in reverse order as the timer counts upward. This is best illustrated in Figure \ref{fig:center-aligned-pwm2}, which shows the switching sequence for sector one described above. 
 
 \begin{figure}[H]
     \centering
@@ -6778,7 +6862,7 @@ The dwell times $T_1$, $T_2$ and $T_0$ specify the total duration for which the 
 
 
 %=========================================================================%
-\subsubsection{Space Vector Modulation}
+\paragraph{Modulation \& Duty Cycles}
 \label{sec:space-vector-modulation}
 %=========================================================================%
 
@@ -6938,13 +7022,19 @@ The midpoint between these two values is:
     v_{mid} = \frac{v_{max} + v_{min}}{2}
 \end{equation}
 
+Recall the equation for inverter pole voltage:
+
+\begin{equation}
+    v_{xg} = v_{xn} + v_{ng}
+\end{equation}
+
 Since a two-level inverter can only output voltages between its supply voltage and reference:
 
 \[
     0 \leq V_{xg} \leq V_{DC}
 \]
 
-The commanded pole voltages are first shifted upwards by half the DC-bus voltage, as with SPWM and THI. However, in common-mode injected SVPWM, an additional term is subtracted from all three pole-voltage commands. This term is the midpoint between the instantaneous maximum and minimum phase-voltage commands, such that the resulting pole-voltage commands have equal margin from the upper and lower limits of the DC bus. Since the same offset is applied to all three pole-voltage commands, it represents a common-mode voltage. Therefore,
+The commanded pole voltages are first shifted upwards by half the DC-bus voltage, as with SPWM and THI. However, in common-mode injected SVPWM, an additional term is subtracted from all three pole-voltage commands. This term is the midpoint between the instantaneous maximum and minimum phase-voltage commands, such that the resulting pole-voltage commands have equal margin from the upper and lower limits of the DC bus for every instantaneous command. Since the this assumes a balanced, three phase system, and because the same offset is applied to all three pole-voltage commands, this represents a common-mode voltage. Therefore:
 
 \begin{equation}
     v_{cm}^* = \frac{V_{DC}}{2} - \frac{v_{max} + v_{min}}{2}
@@ -6958,10 +7048,10 @@ We have extensively explored in Section \ref{sec:common-mode-voltage-injection} 
     v_{cg}^* = v_{cn}^* + v_{cm}^*
 \end{equation}
 
-Where the average neutral voltage is equal to the commanded common-mode voltage:
+Where the average neutral voltage is approximately equal to the commanded common-mode voltage:
 
 \begin{equation}
-    \overline{v}_{ng} = v_{cm}^*
+    \overline{v}_{ng} \approx v_{cm}^*
 \end{equation}
 
 Substituting for the common-mode voltage:
@@ -7110,6 +7200,185 @@ The three inverter duty cycles can then be calcualted
 \end{equation}
 
 This implementation represents the final result that this chapter has been working toward. Beginning with the three-phase inverter and its discrete switching states, the voltage space vector was developed and used to introduce SPWM, third-harmonic injection, and finally SVPWM. Unlike SPWM and THI, SVPWM does not require the explicit generation of sinusoidal phase-voltage references. Instead, it can directly receive the commanded stationary-frame voltage vector $v_\alpha^*,v_\beta^*$, convert it into instantaneous phase-voltage commands through the inverse Clarke transformation, and calculate the inverter duty cycles using the common-mode injection method. SVPWM therefore provides a direct interface between a commanded voltage vector and the physical inverter switching signals required to produce it. The remaining question is how the commanded voltage vector itself should be determined. This is the focus of the next chapter, where Field-Oriented Control (FOC) is developed to calculate the voltage commands required to control the PMSM's currents, torque, and magnetic field.
+
+
+%=========================================================================%
+\pagebreak
+\section{Field Oriented Control}
+\label{sec:field-oriented-control}
+
+\subsection{Principles of Field Oriented Control}
+\label{sec:principles-field-oriented-control}
+
+\subsubsection{From Three-Phase Currents to Flux \& Torque}
+\label{sec:three-phase-currents-to-flux-and-torque}
+%=========================================================================%
+
+The previous chapter established how a desired stator voltage vector can be synthesized by the three-phase inverter using SVPWM, among other modulation techniques. Given a commanded stationary=frame voltage vector, $\mathbf{v}_{\alpha\beta}^*$, SVPWM determins the inverter switching states and their corresponding duty cycles required to appoximate that vector over each switching period. The remaining problem to be solved is therefore not how to produce a voltage vector, but rather which voltage vector should be commanded in order to produce the desired behaviour of the motor.
+
+For a PMSM, the quantites of primary interest are generally not the stator voltages themselves. Instead, the objective is to control the electromagnetic torque developed by the machine, and through it, the rotor speed or position. As established in Chapter \ref{sec:mathematical-model-of-pmsms}, the electromagnetic torque is determined by the interaction between the rotor magnetic field and the magnetic field produced by the stator currents. Consequently, precise control of the motor ultimately requires preceise control of the magnitude and orientation of the stator current vector relative to the rotor.
+
+Attempting to perform this control directly using the three phase currents, $i_a$, $i_b$, and $i_c$ is inconvenient. Under balanced sinusoidal operation, each phase current is continuously varying with electrical angle:
+
+\begin{align}
+    i_a &= I_m\cos(\theta_e + \phi) \\
+    i_b &= I_m\cos(\theta_e + \phi - \frac{2\pi}{3}) \\
+    i_c &= I_m\cos(\theta_e + \phi + \frac{2\pi}{3})
+\end{align}
+
+Such that even steady-state operating requires the controller to track three time-varying reference quantities, like in SPWM. Furthermore, the three currents are not independent: for a balanced three-phase machine:
+
+\begin{equation}
+    i_a + i_b + i_c = 0
+\end{equation}
+
+The physical quanity of interest is therefore better understood not as three indpenedent phase currents, but as a single stator current vector rotating within the machine.
+
+The Clarke transofrm developed in Chapter \ref{sec:mathematical-model-of-pmsms} provides the first simplification by expressing this three-phase system using two orthogonal station-frame components, $i_\alpha$, and $i_\beta$. These components describe the same stator current vector:
+
+\begin{equation}
+    \mathbf{i}_s = i_a\hat{a} + i_b\hat{b} + i_c\hat{c} = i_\alpha\hat{\alpha} + i_\beta\hat{\beta}
+\end{equation}
+
+The current vector, however, continues to rotate through the stationary $\alpha\beta$ reference frame as the machine operates. Thus, although the representation has been reduced from three dimensions to two, the quantites being controlled remain time-varying.
+
+The central idea of Field-Oriented Control (FOC) is to remove this remaining rotation by observing the stator current vector from a reference frame that rotates with the rotor magnetic field. Applying the Park transformation using the rotor electrical angle $\theta_e$ rotates the stationary-frame quantities into the synchronous $dq$ reference frame.
+
+Using typical conventions, the $d$-axis is chosen to remain aligned with the rotor permanent-magnet flux, while the $q$-axis remains $90^\circ$ electrical ahead of it. Consequently, a stator current vector rotating synchronously with the rotor appears stationary when viewed from this reference frame which rotates at the same rate. Balanced sinusoidal phase currents that continuously vary in the $abc$ and $\alpha\beta$ frames therefore become approximately constant, DC quantities $i_d$ and $i_q$ under steady-state synchronous operation. 
+
+This change of reference frame is what makes FOC particularly powerful. Rather than forcing a feedback controller to track sinusoidal quantities whose frequency changes with rotor speed, the controller can regulate approximately DC quantities. More importantly, the orientation of the $dq$ frame gives these quantities a direct physical interpretation. The $d$-axis current determins the component of stator flux magnetomotive force aligned with the rotor magnetic field, while the $q$-axis current determines the component perpendicular to it, which we have seen is directly proportional to torque. The stator current is then equivalently written as:
+
+\begin{equation}
+    \mathbf{i}_s = i_d\hat{d} + i_q\hat{q}
+\end{equation}
+
+Where its magnitude and orientation relative to the rotor are given by:
+
+\begin{equation}
+    |\mathbf{i}_s| = \sqrt{i_d^2 + i_q^2}, \qquad
+    \gamma = \tan^{-1}\left(\frac{i_q}{i_d}\right)
+\end{equation}
+
+Thus, regulating $i_d$ and $i_q$ is equivalent to regulating the magnitude and orientation of the stator magnetic field relative to the rotor. This relationship becomes particularly important when considering electromagnetic torque. For a PMSM, the $dq$-frame torque expression derived in Section \ref{sec:electromechanical-model} is:
+
+\begin{equation}
+    T_e = \frac{3}{2}p[\lambda_mi_q + (L_d - L_q)i_di_q]
+\end{equation}
+
+Where the first term represents torque produced through the interaction of the permanent magnet flux with the $q$-axis stator current, while the second represents reluctance torque resulting from rotor saliency. For a surface mount PMSM, where $L_d \approx L_q$, the reluctance torque negligble and the expression reduces to:
+
+\begin{equation}
+    T_e = \frac{3}{2}p\lambda_mi_q
+\end{equation}
+
+Electromagntic torque is then directly proportional to a single DC control variable, $i_q$. Meanwhile, $i_d$ determines the component of stator current directed along the rotor magnetic field. For an ideal, nonsalient PMSM operating below base speed, no additional $d$-axis current is generally required, and the reference may initially be chosen as:
+
+\begin{equation}
+    i_d^* = 0
+\end{equation}
+
+Under these conditions, commanding $i_q^*$ effectively commands motor torque while $i_d$ is independently regulated to zero. The original problem of controlling three sinusoidal phase currents has therefore been transformed into the considerably simpler problem of regulating two approximately constant orthogonal current components. 
+
+This is the fundmental principle underlying field-oriented control. The measured phse currents are transformed into the rotating $dq$ reference frame, compared against desired $d$- and $q$- axis current references, and the resulting errors are used to determine the stator voltage vector required to drive the currents toward their commanded values. The commanded voltage vector is then transformed back into stationary and three-phase reference frames and synthesized by the inverter using the modulation techniques developed in Chapter \ref{sec:three-phase-interters-and-modulation-techniques}. 
+
+
+%=========================================================================%
+\subsubsection{Current Control Loop}
+\label{sec:current-control-loop}
+%=========================================================================%
+
+The transformation of the stator currents into the rotor synchronous $dq$ frame provides a set of variables that are well suited for feedback control. Until this point, we have only examined simple open-loop implementations of PMSM control. Field Oriented Control requires a closed loop control system to regulate the measured $d$- and $q$-axis currents to their commanded values. The current control loop block diagram for FOC is shown in \ref{fig:foc-block-diagram-v1}. In later sections, we will revisit this block diagram, adding to it as we increase its performance and complexity.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        keepaspectratio
+    ]{foc-block-diagram-v1.pdf}
+
+    \caption{Field Oriented Control Block Diagram}
+    \label{fig:foc-block-diagram-v1}
+\end{figure}
+
+Beginning with the input of the control system, the desired operating condition of the motor is represented by the current references $i_d^*$ and $i_q^*$. These references spcify the desired components of the stator current vector relative to the rotor magnetic field. The measured currents $i_d$ and $i_q$ are subtracted from their respective references to form the current errors:
+
+\begin{equation}
+    e_d = i_d^* - i_d, \qquad
+    e_q = i_q^* - i_q
+\end{equation}
+
+The objective of the current controllers is to drive these errors toward zero. Because the controlled variables are appoximately constant under steady-state operation, conventional proportional-integral (PI) controllers are well suited to this task. We will show this mathematically in later sections. In their most simple continuous-time form, the two controllers may be represented as:
+
+\begin{equation}
+    v_{d,PI}^* = K_{p,d}e_d + K_{i,d}\int e_d \space dt
+\end{equation}
+
+\begin{equation}
+    v_{q,PI}^* = K_{p,q}e_q + K_{i,q}\int e_q \space dt
+\end{equation}
+
+Note that the controller outputs are voltage commands rather than current commands, while the input is the current error. This distrinction is fundamental to the operation of FOC. The inverter cannot directly impose a desired stator current; it can only apply voltages to the motor windings. The resulting currents are determined by the electrical dynamics of the machine. Consequently, the role of the current controller is to continuously determine the $dq$-axis voltages required to drive the measured currents toward their desired values.
+
+In the simplified control architecture, these controller outputs are taken as the commanded synchronous-frame voltages:
+
+\begin{equation}
+    v_d^* \approx v_{d,PI}^*, \qquad
+    v_q^* \approx v_{q,PI}^*
+\end{equation}
+
+The commanded voltage vector may therefore be expressed in the synchronous reference frame as:
+
+\begin{equation}
+    \mathbf{v}_{dq}^* = v_d^*\hat{\mathbf{d}} + v_q^*\hat{\mathbf{q}}
+\end{equation}
+
+Unlike the current-control calculations, however, the physical inverter is stationary with respect to the stator and cannot directly apply voltages along the rotating $d$- and $q$-axis. The commanded voltage vector must therefore be transformed back into a stationary reference frame before it can be synthesized by the inverter.
+
+Using the measured or estimated rotor electrical angle $\theta_e$, the inverse Park transformation rotates the commanded voltage vector from the synchronous $dq$ frame into the stationary $\alpha\beta$ frame:
+
+\begin{equation}
+    \begin{bmatrix}
+        v_\alpha^* \\
+        v_\beta^*
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        \cos\theta_e & -\sin\theta_e \\
+        \sin\theta_e & \cos\theta_e
+    \end{bmatrix}
+    \begin{bmatrix}
+        v_d^* \\
+        v_q^*
+    \end{bmatrix}
+\end{equation}
+
+The resulting quantities $v_\alpha^*$ and $v_\beta^*$ describe the desired stator voltage vector in stationary coordinates. As developed in Chapter 2, this voltage vector can be supplied directly to the sector based SVPWM algorithm to determine the required inverter duty cycles. Alternatively, an inverse Clarke transformation may be used to express the voltage command as the the equivalent three-phase references, $v_a^*$, $v_b^*$ and $v_c^*$ if common-mode SVPWM is used.
+
+\begin{equation}
+    \begin{bmatrix}
+        v_a^* \\
+        v_b^* \\
+        v_c^*
+    \end{bmatrix}
+    = \mathbf{T}_c
+    \begin{bmatrix}
+        v_\alpha^* \\
+        v_\beta^*
+    \end{bmatrix}
+\end{equation}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
