@@ -1848,6 +1848,7 @@ Notice that a balanced three phase quantity transformed by the Clarke transforma
 %=========================================================================%
 \paragraph{Geometric Interpretation}
 \label{geometric-interpretation}
+%=========================================================================%
 
 We have just seen how the new $\alpha\beta$ axes are derived, where the $\alpha$-axis is chosen to be aligned with the magnetic axis of phase $a$, and the $\beta$-axis is displaced from it by $90^\circ$ electrical. The amplitude-invariant Clarke transformation is shown in 2D in Figure \ref{fig:clarke}.
 
@@ -2018,6 +2019,8 @@ Where we denote $\mathbf{T}_c$ as:
 
 %=========================================================================%
 \subsubsection{PMSM Equations in \texorpdfstring{$\alpha\beta$}{Alpha-Beta} Frame}
+%=========================================================================%
+
 Finally, we can convert the synchronous machine $abc$ frame equations to $\alpha\beta$ frame. Note that from here onward, in regards to the forwards Clarke transform, we now exclusively refer to the reduced amplitude invariant form, denoted $\mathbf{T}_c$, unless otherwise specified. Recall the $abc$ frame equations from Section \ref{sec:abc-frame}:
 
 \begin{equation}
@@ -7221,7 +7224,7 @@ This implementation represents the final result that this chapter has been worki
 \label{sec:three-phase-currents-to-flux-and-torque}
 %=========================================================================%
 
-The previous chapter established how a desired stator voltage vector can be synthesized by the three-phase inverter using SVPWM, among other modulation techniques. Given a commanded stationary=frame voltage vector, $\mathbf{v}_{\alpha\beta}^*$, SVPWM determins the inverter switching states and their corresponding duty cycles required to appoximate that vector over each switching period. The remaining problem to be solved is therefore not how to produce a voltage vector, but rather which voltage vector should be commanded in order to produce the desired behaviour of the motor.
+The previous chapter established how a desired stator voltage vector can be synthesized by the three-phase inverter using SVPWM, among other modulation techniques. Given a commanded stationary frame voltage vector, $\mathbf{v}_{\alpha\beta}^*$, SVPWM determins the inverter switching states and their corresponding duty cycles required to appoximate that vector over each switching period. The remaining problem to be solved is therefore not how to produce a voltage vector, but rather which voltage vector should be commanded in order to produce the desired behaviour of the motor.
 
 For a PMSM, the quantites of primary interest are generally not the stator voltages themselves. Instead, the objective is to control the electromagnetic torque developed by the machine, and through it, the rotor speed or position. As established in Chapter \ref{sec:mathematical-model-of-pmsms}, the electromagnetic torque is determined by the interaction between the rotor magnetic field and the magnetic field produced by the stator currents. Consequently, precise control of the motor ultimately requires preceise control of the magnitude and orientation of the stator current vector relative to the rotor.
 
@@ -7294,8 +7297,9 @@ This is the fundmental principle underlying field-oriented control. The measured
 \label{sec:current-control-loop}
 %=========================================================================%
 
-The transformation of the stator currents into the rotor synchronous $dq$ frame provides a set of variables that are well suited for feedback control. Until this point, we have only examined simple open-loop implementations of PMSM control. Field Oriented Control requires a closed loop control system to regulate the measured $d$- and $q$-axis currents to their commanded values. The current control loop block diagram for FOC is shown in \ref{fig:foc-block-diagram-v1}. In later sections, we will revisit this block diagram, adding to it as we increase its performance and complexity.
+The transformation of the stator currents into the rotor synchronous $dq$ frame provides a set of variables that are well suited for feedback control. Until this point, we have only examined simple open-loop implementations of PMSM control. Field Oriented Control requires a closed loop control system to regulate the measured $d$- and $q$-axis currents to their commanded values. The current control loop block diagram for FOC is shown in Figure \ref{fig:foc-block-diagram-v1}. In later sections, we will revisit this block diagram, adding to it as we increase the system performance and complexity.
 
+\vspace{0.5cm}
 \begin{figure}[htbp]
     \centering
     \includegraphics[
@@ -7333,7 +7337,7 @@ In the simplified control architecture, these controller outputs are taken as th
     v_q^* \approx v_{q,PI}^*
 \end{equation}
 
-The commanded voltage vector may therefore be expressed in the synchronous reference frame as:
+We will later modify these values with feedforward terms to improve performance. The commanded voltage vector may therefore be expressed in the synchronous reference frame as:
 
 \begin{equation}
     \mathbf{v}_{dq}^* = v_d^*\hat{\mathbf{d}} + v_q^*\hat{\mathbf{q}}
@@ -7344,34 +7348,99 @@ Unlike the current-control calculations, however, the physical inverter is stati
 Using the measured or estimated rotor electrical angle $\theta_e$, the inverse Park transformation rotates the commanded voltage vector from the synchronous $dq$ frame into the stationary $\alpha\beta$ frame:
 
 \begin{equation}
-    \begin{bmatrix}
-        v_\alpha^* \\
-        v_\beta^*
-    \end{bmatrix}
-    =
-    \begin{bmatrix}
-        \cos\theta_e & -\sin\theta_e \\
-        \sin\theta_e & \cos\theta_e
-    \end{bmatrix}
-    \begin{bmatrix}
-        v_d^* \\
-        v_q^*
-    \end{bmatrix}
+    \mathbf{v}_{\alpha\beta}^* = \mathbf{T}_p^{-1}\mathbf{v}_{dq}^*
 \end{equation}
 
-The resulting quantities $v_\alpha^*$ and $v_\beta^*$ describe the desired stator voltage vector in stationary coordinates. As developed in Chapter 2, this voltage vector can be supplied directly to the sector based SVPWM algorithm to determine the required inverter duty cycles. Alternatively, an inverse Clarke transformation may be used to express the voltage command as the the equivalent three-phase references, $v_a^*$, $v_b^*$ and $v_c^*$ if common-mode SVPWM is used.
+The resulting quantities $v_\alpha^*$ and $v_\beta^*$ describe the desired stator voltage vector in stationary coordinates. As developed in Chapter 2, this voltage vector can be supplied directly to the sector based SVPWM algorithm to determine the required inverter duty cycles. Alternatively, an inverse Clarke transformation may be used to express the voltage command as the the equivalent three-phase references, $v_a^*$, $v_b^*$ and $v_c^*$ if SVPWM is used.
 
 \begin{equation}
-    \begin{bmatrix}
-        v_a^* \\
-        v_b^* \\
-        v_c^*
-    \end{bmatrix}
-    = \mathbf{T}_c
-    \begin{bmatrix}
-        v_\alpha^* \\
-        v_\beta^*
-    \end{bmatrix}
+    \mathbf{v}_{abc}^* = \mathbf{T}_c^{-1}\mathbf{v}_{\alpha\beta}^*
+\end{equation}
+
+The inverter then applies the corresponding phase voltages, $v_a$, $v_b$ and $v_c$ to the stator windings in terms of duty cycles. These voltages cause the phase currents to evolve according to the electrical dynamics of the PMSM. The resulting currents $i_a$, $i_b$ and $i_c$ are measured and returned to the controller, closing the feedback loop.
+
+To compare the measured currents against the synchronous frame references, the measurement process performs the reverse sequence of coordinate transformations. The measured phase currents are first transformed into the stationary reference frame using the Clarke transformation:
+
+\begin{equation}
+    \mathbf{i}_{\alpha\beta} = \mathbf{T}_c\mathbf{i}_{abc}
+\end{equation}
+
+Then are subsequently rotated into the synchronous reference frame using the Park transformation:
+
+\begin{equation}
+    \mathbf{i}_{dq} = \mathbf{T}_p\mathbf{i}_{abc}
+\end{equation}
+
+The same electrical rotor angle $\theta_e$ must therefore be used consistently by both the forward and inverse transformations. For a sensored FOC system, this angle may be obtainred from an encoder or resolver measuring the mechancial rotor angle $\theta_m$, from which the electrical angle is determined according to:
+
+\begin{equation}
+    \theta_e = p\theta_m
+\end{equation}
+
+Where $p$ is the number of pole pairs. In practice, an appropriate electrical zero angle offset must also be established so that the controller's $d$-axis is correctly aligned with the permamnent magnet flux axis. Sensorless control replaces the physical position measurement with an estimate of this angle, but otherwise retains the same fundamental reference-frame structure.
+
+Once transformed, $i_d$ and $i_q$ are again compared with $i_d^*$ and $i_q^*$ and the process repeats. Although several transformations are involved, the control objective itself is straightforward: adjust the stator voltage vector such that the measured synchronous frame current vector follows its commanded value. 
+
+
+%=========================================================================%
+\subsection{Design of \texorpdfstring{$dq$}{dq} Current Controllers}
+\label{sec:design-of-dq-current-controllers}
+%=========================================================================%
+
+The current-control structure of Section \ref{sec:current-control-loop} establishes the basic feedback architecture of Field-Oriented Control. The measured $d$- and $q$-axis currents are compared against their respective reference values, and the resulting current errors are minmimized by feedback controllers through the commanded $dq$ reference frame voltages. However, Figure \ref{fig:foc-block-diagram-v1} alone does not establish how these controllers should be designed, nor does it account for the dynmaic relationship between the commanded voltages and resulting stator currents.
+
+To design the current controllers systematically, the PMSM iteself must be considered as part of the control loop. From a tradtitional control system persepective, the motor acts as the plant: the commanded stator voltages $v_d^*$ and $v_q^*$ form the plant inputs, while the resulting currents $i_d$ and $i_q$ form the quantities to be regulated. However, inspection of the PMSM voltge equations reveals a problem--The two axes are dynamically coupled through terms proportional to the electrical speed. In addition, the $q$-axis voltage must overcome the back-EMF produced by the rotor flux.
+
+Consequently, the PMSM cannot be treated as two independent $RL$ circuits, making the process of tuning the PI current controllers significantly more difficult. This section develops the $dq$-axis current controllers beginning from the coupled PMSM model. We will see how we can eliminate the cross coupling terms and approximatley decouple the two axes. The resulting system can be used to derive the gains of the $dq$-axis current controllers. 
+
+
+%=========================================================================%
+\subsubsection{Coupled \texorpdfstring{$dq$}{dq}-Axis Dynamics}
+\label{sec:coupled-dq-dynamics}
+%=========================================================================%
+
+Recall the PMSM motor equations derived in Chapter \ref{sec:mathematical-model-of-pmsms}:
+
+\begin{equation}
+    v_d = R_si_d + L_d\frac{di_d}{dt} - \omega_eL_qi_q
+\end{equation}
+
+\begin{equation}
+    v_q = R_si_q + L_q\frac{di_q}{dt} + \omega_eL_di_d + \omega_e\lambda_m
+\end{equation}
+
+These equations describe how the applied $dq$ voltages determine the evolution of the corresponding stator currents. Rearranging each equation to isolate the current derivative:
+
+\begin{equation}
+    L_d\frac{di_d}{dt} = v_d - R_si_d + \omega_eL_qi_q
+\end{equation}
+
+\begin{equation}
+    L_q\frac{di_q}{dt} = v_q - R_si_q - \omega_eL_di_d - \omega_e\lambda_m
+\end{equation}
+
+If  the speed dependent terms were absent, each axis would have the form of a simple series $RL$ circuit. Consider briefly, for example, the $d$-axis dynamics would reduce to:
+
+\begin{equation}
+    v_d = R_si_d + L_d\frac{di_d}{dt}
+\end{equation}
+
+Taking the Laplace transform with zero inital conditions:
+
+\begin{equation}
+    V_d(s) = (R_s + sL_d)I_d(s)
+\end{equation}
+
+The corresponding voltage to current transfer function is then:
+
+\begin{equation}
+    G_d(s) = \frac{I_d(s)}{V_d(s)} = \frac{1}{L_ds + R_s}
+\end{equation}
+
+Similarly, the $q$-axis plant would be:
+
+\begin{equation}
+    G_q(s) = \frac{I_q(s)}{V_q(s)} = \frac{1}{L_qs + R_s}
 \end{equation}
 
 
@@ -7380,15 +7449,52 @@ The resulting quantities $v_\alpha^*$ and $v_\beta^*$ describe the desired stato
 
 
 
+%=========================================================================%
+\subsubsection{Axis Decoupling \& Feedforard Compensation}
+\label{sec:axis-decoupling-and-ff-compensation}
+%=========================================================================%
 
 
+%=========================================================================%
+\subsubsection{PI Current Controller Design}
+\label{sec:pi-current-controller-design}
+%=========================================================================%
 
 
+%=========================================================================%
+\subsection{Voltage Limitations \& Anti-Windup}
+\label{sec:voltage-limitations-and-anti-windup}
+%=========================================================================%
 
 
+-3.3.1 Voltage Vector Saturation
+-3.3.2 PI Integrator Windup
+-3.3.3 Anti-Windup Strategies
 
+-3.4 Cascaded Torque, Velocity, and Position Control
+-3.4.1 Torque Control
+-3.4.2 Velocity Control
+-3.4.3 Position Control
 
+-3.5 Digital Implmentations of FOC
+-3.5.1 Sampling the Control System
+-3.5.2 Discreization of the PI Controller
+-3.5.3 z-Domain Representation
+-3.5.4 Computational Delay
+-3.5.5 FOC Execution Sequence
 
+-3.6 Rotor Position and Speed Feedback
+-3.6.1 Sensored Rotor Position
+
+-3.7 Sensorless Field Oriented Control
+-3.7.1 Sensorless Control problem
+-3.7.2 Back EMF Based Estiamtion
+-3.7.3 Flux Observers
+-3.7.4 State Observers
+-3.7.5 Sliding Mode Observer
+-3.7.6 PLL Based Angle Tracking
+-3.7.7 Low Speed and Zero-Speed Limitations
+%}
 
 
 
