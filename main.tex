@@ -7461,7 +7461,7 @@ A more useful control structure can be obtained by explicitly compensating for t
 
 
 %=========================================================================%
-\subsubsection{Axis Decoupling and Feedforward Compensation}
+\subsubsection{Axis Decoupling \& Feedforward Compensation}
 \label{sec:axis-decoupling-ff-compensation}
 %=========================================================================%
 
@@ -7505,16 +7505,16 @@ Similarly, for the $q$-axis:
     v_{q,PI}^* &= R_si_q + L_q\frac{di_q}{dt}
 \end{align}
 
-%=========================================================================%
-\subsubsection{Axis Decoupling \& Feedforard Compensation}
-\label{sec:axis-decoupling-and-ff-compensation}
-%=========================================================================%
+Now, we can update our block diagram to include these feedforward terms, inserted at a summing junction between the PI controller outputs and the inverse Park transform.
 
 
 %=========================================================================%
 \subsubsection{PI Current Controller Design}
 \label{sec:pi-current-controller-design}
 %=========================================================================%
+
+
+
 
 
 %=========================================================================%
@@ -7556,6 +7556,7 @@ Similarly, for the $q$-axis:
 
 
 %=========================================================================%
+\newpage
 \appendix
 \renewcommand{\thesection}{\Alph{section}.}
 %=========================================================================%
