@@ -7395,55 +7395,6 @@ Consequently, the PMSM cannot be treated as two independent $RL$ circuits, makin
 
 
 %=========================================================================%
-\subsubsection{Coupled \texorpdfstring{$dq$}{dq}-Axis Dynamics}
-\label{sec:coupled-dq-dynamics}
-%=========================================================================%
-
-Recall the PMSM motor equations derived in Chapter \ref{sec:mathematical-model-of-pmsms}:
-
-\begin{equation}
-    v_d = R_si_d + L_d\frac{di_d}{dt} - \omega_eL_qi_q
-\end{equation}
-
-\begin{equation}
-    v_q = R_si_q + L_q\frac{di_q}{dt} + \omega_eL_di_d + \omega_e\lambda_m
-\end{equation}
-
-These equations describe how the applied $dq$ voltages determine the evolution of the corresponding stator currents. Rearranging each equation to isolate the current derivative:
-
-\begin{equation}
-    L_d\frac{di_d}{dt} = v_d - R_si_d + \omega_eL_qi_q
-\end{equation}
-
-\begin{equation}
-    L_q\frac{di_q}{dt} = v_q - R_si_q - \omega_eL_di_d - \omega_e\lambda_m
-\end{equation}
-
-If  the speed dependent terms were absent, each axis would have the form of a simple series $RL$ circuit. Consider briefly, for example, the $d$-axis dynamics would reduce to:
-
-\begin{equation}
-    v_d = R_si_d + L_d\frac{di_d}{dt}
-\end{equation}
-
-Taking the Laplace transform with zero inital conditions:
-
-\begin{equation}
-    V_d(s) = (R_s + sL_d)I_d(s)
-\end{equation}
-
-The corresponding voltage to current transfer function is then:
-
-\begin{equation}
-    G_d(s) = \frac{I_d(s)}{V_d(s)} = \frac{1}{L_ds + R_s}
-\end{equation}
-
-Similarly, the $q$-axis plant would be:
-
-\begin{equation}
-    G_q(s) = \frac{I_q(s)}{V_q(s)} = \frac{1}{L_qs + R_s}
-\end{equation}
-
-%=========================================================================%
 \subsubsection{Coupled \texorpdfstring{$dq$}{dq}-Axis Current Dynamics}
 \label{sec:coupled-dq-axis-current-dynamics}
 %=========================================================================%
@@ -7455,7 +7406,7 @@ Recall from Section \ref{sec:electromechanical-model} that the PMSM's stator vol
 \end{equation}
 
 \begin{equation}
-    v_q = Ri_q + L_q\frac{di_q}{dt} + \omega_eL_di_d
+    v_q = Ri_q + L_q\frac{di_q}{dt} + \omega_eL_di_d + \omega_e\lambda_m
 \end{equation}
 
 These equations describe how the applied $d$- $q$-axis voltages determine the evolution of the corresponding stator currents. If the speed-dependent terms were absent, each axis would have the form of a simple series $RL$ circuit. For example, the $d$-axis current dynamics would reduce to:
