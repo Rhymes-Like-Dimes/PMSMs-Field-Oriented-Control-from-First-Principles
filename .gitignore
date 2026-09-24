@@ -1,10 +1,16 @@
-# LaTeX intermediate/build files
+# LaTeX generated files
 *.aux
 *.bbl
 *.blg
 *.fdb_latexmk
 *.fls
+*.lof
 *.log
+*.lot
 *.out
 *.synctex.gz
+*.synctex(busy)
 *.toc
+
+# Generated document
+*.pdf
