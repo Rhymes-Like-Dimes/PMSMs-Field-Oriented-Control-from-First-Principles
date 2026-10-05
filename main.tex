@@ -4182,11 +4182,54 @@ The state vector is defined as as the vector containing the state variables: $i_
 Then, the complete model is:
 
 \begin{align}
-    \dot{i_d} &= \frac{1}{L_d}(v_d - R_si_d + p\omega_mL_qi_q) \\[4pt]
-    \dot{i_q} &= \frac{1}{L_q}(v_q - R_si_q - p\omega_mL_di_d - p\omega_m\lambda_m) \\[4pt]
-    \dot{\omega_m} &= \frac{1}{J}\left[ \frac{3}{2}p\lambda_mi_q - T_L - B\omega_m\right] \\[4pt]
-    \dot{\theta_m} &= \omega_m
+    \dot{i}_d &= \frac{1}{L_d}(v_d - R_si_d + p\omega_mL_qi_q) \\[4pt]
+    \dot{i}_q &= \frac{1}{L_q}(v_q - R_si_q - p\omega_mL_di_d - p\omega_m\lambda_m) \\[4pt]
+    \dot{\omega}_m &= \frac{1}{J}\left[ \frac{3}{2}p\lambda_mi_q - T_L - B\omega_m\right] \\[4pt]
+    \dot{\theta}_m &= \omega_m
 \end{align}
+
+In state-space matrix form, using the state variabels defined above:
+
+\begin{equation}
+    \mathbf{\mathbf{\dot{x}}} = \mathbf{Ax} + \mathbf{Bu}
+\end{equation}
+
+\begin{equation}
+    \dot{\mathbf{x}}
+    =
+    \underbrace{
+    \begin{bmatrix}
+        -\dfrac{R_s}{L_d}
+        & \dfrac{pL_q\omega_m}{L_d}
+        & 0 & 0 \\[6pt]
+        -\dfrac{pL_d\omega_m}{L_q}
+        & -\dfrac{R_s}{L_q}
+        & -\dfrac{p\lambda_m}{L_q}
+        & 0 \\[6pt]
+        0
+        & \dfrac{3p\lambda_m}{2J}
+        & -\dfrac{B}{J}
+        & 0 \\[6pt]
+        0 & 0 & 1 & 0
+    \end{bmatrix}
+    }_{\mathbf{A}}
+    \begin{bmatrix}
+        i_d \\ i_q \\ \omega_m \\ \theta_m
+    \end{bmatrix}
+    +
+    \underbrace{
+    \begin{bmatrix}
+        \dfrac{1}{L_d} & 0 & 0 \\[6pt]
+        0 & \dfrac{1}{L_q} & 0 \\[6pt]
+        0 & 0 & -\dfrac{1}{J} \\[6pt]
+        0 & 0 & 0
+    \end{bmatrix}
+    }_{\mathbf{B}}
+    \begin{bmatrix}
+        v_d \\ v_q \\ T_L
+    \end{bmatrix}.
+    \label{eq:pmsm-state-space}
+\end{equation}
 
 The model developed in this chapter describes the response of the PMSM to an applied stator voltage vector. In practice, however, these continuous voltage commands cannot be applied directly to the motor. A motor drive is supplied by a DC source and must synthesize the required three-phase stator voltages through the discrete switching states of a three-phase voltage-source inverter. Chapter 2 therefore develops the relationship between the DC link voltage, inverter switching states, phase and line voltages, and the modulation techniques used to realize a command stator voltage vector. 
 
@@ -7506,6 +7549,18 @@ Similarly, for the $q$-axis:
 \end{align}
 
 Now, we can update our block diagram to include these feedforward terms, inserted at a summing junction between the PI controller outputs and the inverse Park transform.
+
+% \vspace{0.5cm}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        keepaspectratio
+    ]{foc-block-diagram-v2.pdf}
+
+    \caption{Field Oriented Control Block Diagram}
+    \label{fig:foc-block-diagram-v2}
+\end{figure}
 
 
 %=========================================================================%
