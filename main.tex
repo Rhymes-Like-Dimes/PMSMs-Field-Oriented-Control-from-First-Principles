@@ -7210,7 +7210,7 @@ Therefore:
 And finally:
 
 \begin{equation}
-    V_m \leq \frac{V_{DC}}{3}
+    V_m \leq \frac{V_{DC}}{\sqrt{3}}
 \end{equation}
 
 
@@ -7548,7 +7548,7 @@ Similarly, for the $q$-axis:
     v_{q,PI}^* &= R_si_q + L_q\frac{di_q}{dt}
 \end{align}
 
-Now, we can update our block diagram to include these feedforward terms, inserted at a summing junction between the PI controller outputs and the inverse Park transform.
+Now, we can update our block diagram to include the feedforward terms, which are inserted at a summing junction between the PI controller outputs and the inverse Park transform. The updated block diagram is shown in Figure \ref{fig:foc-block-diagram-v2}.
 
 % \vspace{0.5cm}
 \begin{figure}[htbp]
@@ -7568,8 +7568,89 @@ Now, we can update our block diagram to include these feedforward terms, inserte
 \label{sec:pi-current-controller-design}
 %=========================================================================%
 
+Using the decoupled system, the current dynamics seen by the PI controllers are approximately:
 
+\begin{equation}
+    v_{d,PI}^* = R_si_d + L_d\frac{di_d}{dt}, \qquad
+    v_{q,PI}^* = R_si_q + L_q\frac{di_q}{dt}
+\end{equation}
 
+Each axis therefore behaves as an independent first-order RL plant. Assuming zero initial conditions, it is straight forward to derive the corresponding transfer functions in the Laplace domain:
+
+\begin{equation}
+    \frac{I_d(s)}{V_d(s)} = \frac{1}{R + sL_d} = \frac{1/R}{1 + sL_d/R}
+\end{equation}
+
+\begin{equation}
+    \frac{I_q(s)}{V_q(s)} = \frac{1}{R + sL_q} = \frac{1/R}{1 + sL_q/R}
+\end{equation}
+
+The control loop follows a typical feedback structure, where the measured current is subtracted from the reference to form an error signal. The error is then processed by some controller, which generates the commanded voltage. The resulting current is then measured and fed back to the input. The block diagram of this control loop is shown in \ref{fig:feedback-control}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        keepaspectratio
+    ]{feedback-control.pdf}
+
+    \caption{Typical Feedback Control Loop}
+    \label{fig:feedback-control}
+\end{figure}
+
+The closed loop transfer function of a typical feedback control system is given by:
+
+\begin{equation*}
+    \frac{Y(s)}{R(s)} = \frac{G(s)C(s)}{1 + G(s)C(s)}
+\end{equation*}
+
+In this structure, the motor is represented by the transfer function $G(s)$, while the controller is represented by $C(s)$. The reference input, provided as a current reference, is denoted by $R(s)$, while the measured output, the measured current, is denoted by $Y(s)$. Because both plants have identical structures, two of these systems can be considered for each axis.
+
+Consider first a proportional controller, where the commanded voltage is proportional to the current error:
+
+\begin{equation}
+    V_{PI}^*(s)=K_p\left[I^{*}(s)-I(s)\right]
+\end{equation}
+
+Substituting this controller and the motor transfer function into the closed-loop transfer function, we have:
+
+\begin{equation}
+    \frac{I(s)}{I^*(s)} = \frac{K_p/(R + sL)}{1 + K_p/(R + sL)} = \frac{K_p}{R + sL + K_p}
+\end{equation}
+
+With unity negative feedback, the closed-loop transfer function is:
+
+\begin{equation}
+    \frac{I(s)}{I^*(s)} = \frac{K_p}{R + sL + K_p} = \frac{K_p/(R + K_p)}{1 + sL/(R + K_p)}
+\end{equation}
+
+Which we recognize as a first-order system of the form:
+
+\begin{equation}
+    G(s) = \frac{K}{1 + s\tau}
+\end{equation}
+
+Where tau is the time constant of the system, and $K$ is the DC gain. Comparing terms, we can identify:
+
+\begin{equation}
+    \tau = \frac{L}{R + K_p}, \qquad
+    K = \frac{K_p}{R + K_p}
+\end{equation}
+
+Thus the closed-loop system is first-order, with a time constant that decreases as the proportional gain increases. However, the DC gain is less than one, meaning that there will be a steady-state error in the current response. Consequently, a proportional controller alone is insufficient for current control.
+
+Integral action resolves this limitation by adding a term to the controller that is proportional to the integral of the current error. The PI controller introduced in 
+Section \ref{sec:current-control-loop} has the transfer function:
+
+\begin{equation}
+    C(s) = K_p + \frac{K_i}{s}
+\end{equation}
+
+Its pole at the origin provides infinite DC gain, allowing zero steady-state error for a constant current reference, provided the closed loop system is stable and the required control inputs are within the physical limits of the inverter. The closed-loop transfer function of the PI-controlled system is therefore:
+
+\begin{equation}
+    \frac{I(s)}{I^*(s)} = \frac{(K_p + K_i/s)/(R + sL)}{1 + (K_p + K_i/s)/(R + sL)} = \frac{K_p + K_i/s}{R + sL + K_p + K_i/s} = \frac{K_ps + K_i}{}
+\end{equation}
 
 
 %=========================================================================%
