@@ -7649,14 +7649,202 @@ Section \ref{sec:current-control-loop} has the transfer function:
 Its pole at the origin provides infinite DC gain, allowing zero steady-state error for a constant current reference, provided the closed loop system is stable and the required control inputs are within the physical limits of the inverter. The closed-loop transfer function of the PI-controlled system is therefore:
 
 \begin{equation}
-    \frac{I(s)}{I^*(s)} = \frac{(K_p + K_i/s)/(R + sL)}{1 + (K_p + K_i/s)/(R + sL)} = \frac{K_p + K_i/s}{R + sL + K_p + K_i/s} = \frac{K_ps + K_i}{}
+    \frac{I(s)}{I^*(s)} = \frac{(K_p + K_i/s)/(R + sL)}{1 + (K_p + K_i/s)/(R + sL)} = \frac{K_p + K_i/s}{R + sL + K_p + K_i/s} = \frac{K_ps + K_i}{s^2L + s(R + K_p) + K_i}
 \end{equation}
 
+The resulting closed loop transfer function is second-order and contains a zero at $s = -K_i/K_p$. However, the controller gains can be selected to simplify this response. In particlar, choosing the controller zero to cancel the plant pole at $s = R/L$ results in a first-order closed-loop response. We can see this more clearly by rewriting the closed-loop transfer function as:
+
+\begin{equation}
+    \frac{I(s)}{I^*(s)} = \frac{K_ps + K_i}{Ls^2 + s(R + K_p) + K_i} = \frac{K_p(s + K_i/K_p)}{Ls^2 + s(R + K_p) + K_i}
+\end{equation}
+
+For pole-zero cancellation, we require that one of the closed-loop poles be equal to the controller zero. We want to express the denominator as:
+
+\begin{equation}
+\label{eqn:desired-char-eq}
+    Ls^2 + s(R + K_p) + K_i = L\left(s + \frac{K_i}{K_p}\right)(s + a)
+\end{equation}
+
+Where $a$ is the remaining, unknown, closed-loop pole. Expanding the right-hand side:
+
+\begin{equation}
+    L\left(s + \frac{K_i}{K_p}\right)(s + a) = Ls^2 + L\left(a + \frac{K_i}{K_p}\right)s + La\frac{K_i}{K_p}
+\end{equation}
+
+Equating the original characteristic equation with the desired form:
+
+\begin{equation}
+    Ls^2 + s(R + K_p) + K_i = Ls^2 + L\left(a + \frac{K_i}{K_p}\right)s + La\frac{K_i}{K_p}
+\end{equation}
+
+Assuming $K_i \neq 0$, matching the constant terms gives:
+
+\begin{equation}
+    K_i = La\frac{K_i}{K_p} \quad\Rightarrow\quad a = \frac{K_p}{L}
+\end{equation}
+
+Equating the coefficients of $s$ additionally requires:
+
+\begin{equation}
+    R + K_p = L\left(a + \frac{K_i}{K_p}\right)
+\end{equation}
+
+Substituting the value of $a = K_p/L$ gives:
+
+\begin{align}
+    R + K_p &= L\left(\frac{K_p}{L} + \frac{K_i}{K_p}\right) \\
+    R + K_p &= K_p + L\frac{K_i}{K_p} \\
+    R & = L\frac{K_i}{K_p} \\
+    \frac{K_i}{K_p} &= \frac{R}{L}
+\end{align}
+
+Substituting $a$ again into Equation \ref{eqn:desired-char-eq} gives the following transfer function:
+
+\begin{equation}
+    \frac{I(s)}{I^*(s)} = \frac{K_p(s + K_i/K_p)}{L(s + K_i/K_p)(s + K_p/L)}
+\end{equation}
+
+Now, we can cancel the common factor of $(s + K_i/K_p)$ from the numerator and denominator, leaving a first-order closed-loop transfer function:
+
+\begin{equation}
+    \frac{I(s)}{I^*(s)} = \frac{K_p/L}{s + K_p/L}, \qquad \frac{K_i}{K_p} = \frac{R}{L}
+\end{equation}
+
+The resulting closed-loop response has unity DC gain and a time constant of:
+
+\begin{equation}
+    \tau = \frac{L}{K_p}
+\end{equation}
+
+Thus, the proportional gain determines the speed of the current response, while the integral gain is selected to satisfy the pole-zero cancellation condition. Defining the desired current-loop bandwidth as $\omega_c = 1/\tau$, in radians per second, the target transfer function is:
+
+\begin{equation}
+    \frac{I(s)}{I^*(s)} = \frac{\omega_c}{s + \omega_c}
+\end{equation}
+
+Comparing this expression with the previous result, we find that:
+
+\begin{equation}
+    \omega_c = \frac{K_p}{L}
+\end{equation}
+
+Together with $K_i/K_p = R/L$, this yields the controller gains:
+
+\begin{equation}
+    K_p = \omega_cL, \qquad
+    K_i = \omega_cR
+\end{equation}
+
+Applying this result independently to the $d$- and $q$-axis controllers, with the same desired bandwidth for both axes, gives:
+
+\begin{equation}
+    \begin{aligned}
+        K_{p,d} &= L_d\omega_c, &
+        K_{i,d} &= R\omega_c, \\
+        K_{p,q} &= L_q\omega_c, &
+        K_{i,q} &= R\omega_c
+    \end{aligned}
+\end{equation}
+
+For a nonsalient machine wiht $L_d = L_q$, the two controllers are indentical. In practice, this response depends on the accuracy of the motor parameters and feedforward compensation, and is affected by sampling and computational delays. The available inverter voltage also limits how quickly the current can change. Consequently, the bandwidth cannot be increased arbitrarily. Next, we examine the effects of voltage saturation and the anti-windup measures required when the commanded voltage exceeds the inverter's available output.
 
 %=========================================================================%
 \subsection{Voltage Limitations \& Anti-Windup}
 \label{sec:voltage-limitations-and-anti-windup}
 %=========================================================================%
+
+We have previously assumed that the commanded voltage vector can be applied to the motor without limitation. In practice, the inverter can only apply voltages within a limited range, and the commanded voltage may exceed this range under certain operating conditions. When this occurs, the controller must be modified to account for the saturation of the voltage vector. Otherwise, the integrator in the PI controller will continue to accumulate error, resulting in integrator windup, overshoot, oscilallation and potential instability.
+
+
+%=========================================================================%
+\subsubsection{Voltage Vector Saturation}
+\label{sec:voltage-vecotr-saturation}
+%=========================================================================%
+
+As established in Chapter \ref{sec:three-phase-interters-and-modulation-techniques}, the maximum magntitude of a rotating voltage vector that can be produced using SVPWM without entering overmodulation is:
+
+\begin{equation}
+    |\mathbf{V}_s|_{max} = \frac{V_{dc}}{\sqrt{3}}
+\end{equation}
+
+This limit corresponds to the radius of the circle inscribed within the inverter's hexagonal voltage region. Although larger voltage vectors are available at certain angles, the circular limit provides a voltage magnitude that is achievable at every electrical angle. 
+
+The inverse Park transform rotates the voltage vector without changing its magnitude. Consequently, the same circular limit can be applied directly in the $dq$ reference frame:
+
+\begin{equation}
+    \sqrt{(v_d^*)^2 + (v_q^*)^2} \leq |\mathbf{V}_s|_{\max}
+\end{equation}
+
+Here, $v_d^*$ and $v_q^*$ denote the total voltage commands, including both PI feedback and feedforward components. Because both axes share the available inverter voltage, their limits cannot be treated independently. A straight forward approach is to scale both voltage components by the same factor when the commanded voltage exceeds the maximum:
+
+\begin{equation}
+    |\mathbf{V}_s| = \sqrt{(v_d^*)^2 + (v_q^*)^2}
+\end{equation}
+
+The scaling factor is:
+
+\begin{equation}
+    \gamma =
+    \begin{cases}
+        1, & V^* \leq V_{\max} \\[4pt]
+        \displaystyle\frac{V_{\max}}{V^*},
+        & V^* > V_{\max}
+    \end{cases}
+\end{equation}
+
+The limited voltage commands are then:
+
+\begin{align}
+    v_{d,\mathrm{sat}}^* &= \gamma v_d^* \\
+    v_{q,\mathrm{sat}}^* &= \gamma v_q^*
+\end{align}
+
+This method preserves the direction of the requested voltage vector while reducing its magnitude to an achievable value. The limited commands are passed to the inverse Park transform and subsequently to the modulation algorithm.
+
+In practice, a margin may be included by selecting $V_{\max} = \eta V_{DC}/\sqrt{3}$, where $0 < \eta < 1$. Note that the DC-link voltage used to calculate this limit should reflect its measured value, since variations in the supply voltage change the available output.
+
+Using this method, the voltage vector is always limited to the maximum achievable value (unless a margin is included). However, the PI controllers are not aware of this limitation, and will continue to integrate the current error. This can lead to integrator windup, where the integrator accumulates a large error during saturation, resulting in overshoot and oscillation when the target voltage is removed. To prevent this, anti-windup strategies are employed. 
+
+
+%=========================================================================%
+\subsubsection{Integrator Windup}
+\label{sec:integrator-windup}
+%=========================================================================%
+
+To examine windup, it is useful to express each PI controller using an explicit state for its integral contribution. For either axis, $j \in \{d,q\}$, define the current error as:
+
+\begin{equation}
+    e_j = i_j^* - i_j
+\end{equation}
+
+Let $x_j$ denote the integral contribution to the controller output, measured in volts. The PI controlled is then described by:
+
+\begin{align}
+    v_{j,PI}^* &= K_{p,j}e_j + x_j \\
+    x_j &= K_{i,j}\int e_j \space dt
+\end{align}
+
+During normal operation, integral action adjusts the voltage command until the steady-state current error is eliminated. During saturation however, the requested voltage is no longer fully applied to the motor. A persistent current error can therefore continue increasing the integral state without producing a corresponding increase in the applied voltage (due to inverter limitations).
+
+For example, if the $q$-axis current reference is increased substantially, the controller may request a voltage vector outside the available region. The limiter restricts the voltage, so the current cannot rise as quickly as the unsaturated controller predicts. While $e_q > 0$, the integral state continues to increase, even though the applied voltage is limited:
+
+\begin{equation}
+    x_q(t) = x_q(t_0) + K_{i,q}\int_{t_0}^{t} e_q(\tau) \space d\tau
+\end{equation}
+
+The resulting accumulation is referred to as integrator windup. When the current approaches its reference, the proportional term decreases, but the accumulated integral contribution may keep the voltage command saturated. The current can then overshoot its reference. A negative current error is required to reduce the integral state, which may delay the return to normal operation. 
+
+Windup can also occur when the requested current is not achievable at the present speed and DC-link voltage. In this case, the error may persist indefinitely, allowing an unprotected integrator to continue accumulating error indefinitely. Merely limiting the voltage command protects the modulation stage from an excessive request, but does not prevent this internal accumulation. 
+
+%=========================================================================%
+\paragraph{Anti-Windup Strategies}
+\label{sec:anti-windup-strategies}
+%=========================================================================%
+
+
+
+
+
 
 
 -3.3.1 Voltage Vector Saturation
