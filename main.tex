@@ -7841,6 +7841,56 @@ Windup can also occur when the requested current is not achievable at the presen
 \label{sec:anti-windup-strategies}
 %=========================================================================%
 
+Anti-windup modifies the integral action when the requested voltage cannot be realized. There are numerous approaches to anti-windup, but they all share the same objective: prevent the integrator from accumulating error when the controller output is saturated. In this section, we examine a number of these strategies. From least to most complex, they are: integral clamping, conditional integration, and back calculation.
+
+
+%=========================================================================%
+\paragraph{Integral Clamping}
+%=========================================================================%
+
+Integral clamping imposes upper and lower bounds on the integral contribution:
+
+\begin{equation}
+    x_{j,min} \leq x_j \leq x_{j,max}
+\end{equation}
+
+At each integration step, the total integral contribution is compared with the upper and lower limits. If either limit is exceeded, the integral state is constrained to the permitted range, either the maximum or minimum. Therefore, once the integral contribuiton reaches a bound, further accumulation in that direction is prevented. An error of the opposite sign allows the integral contribution to move away from the bound.
+
+While this method is simply and prevents unbounded accumulation, it does not directly represent the voltage currently available to the controller. The total command also contains proportional and feedforward contributions, and the two axes share a voltage-vector limit. Consequently, the total voltage can saturate before an integral bound is reached, or an overly restrictive bound can prevent the controller from supplying a necessary steady-state voltage. Thus integrator clamping tends to be more of a mitigation technique rather than a complete solution.
+
+
+%=========================================================================%
+\paragraph{Conditional Integration}
+%=========================================================================%
+
+Conditional integration determines whether an integral update should be applied based on the saturation condition and the direction of the proposed update. When the voltage command is achievable, integration proceeds normally. When saturation occurs, integration is suspended if it would drive the command further into saturation. Integration is permitted if it would help bring the command back toward the achievable region.
+
+For a controller with upper and lower output limits, where $x$ is the integral state:
+
+\begin{equation}
+    \frac{dx}{dt} = 
+    \begin{cases}
+        0, & |\mathbf{V}_s|^* > |\mathbf{V}_s|_{\max}\ \text{and}\ e > 0, \\
+        0, & |\mathbf{V}_s|^* < |\mathbf{V}_s|_{\max}\ \text{and}\ e < 0, \\
+        K_ie, & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+
+
+
+
+%=========================================================================%
+\paragraph{Back-Calculation}
+%=========================================================================%
+
+Back-calcualtion dynamically forces the integrator to reset itself when an actuator saturates. Instead of just turning the integrator off (like clamping), it monitors the gap between what hte controller "wants" to do and what the actuator can do, using that error to wind down the integral term. First, the controller calculates its output as normal
+
+\begin{equation}
+    \Delta v_d = v_{d,sat}^* - v_d^* \\
+    \Delta v_q = v_{q,sat}^* - v_q^*
+\end{equation}
+
 
 
 
