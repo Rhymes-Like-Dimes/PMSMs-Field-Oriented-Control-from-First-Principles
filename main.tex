@@ -7758,7 +7758,7 @@ We have previously assumed that the commanded voltage vector can be applied to t
 
 %=========================================================================%
 \subsubsection{Voltage Vector Saturation}
-\label{sec:voltage-vecotr-saturation}
+\label{sec:voltage-vector-saturation}
 %=========================================================================%
 
 As established in Chapter \ref{sec:three-phase-interters-and-modulation-techniques}, the maximum magntitude of a rotating voltage vector that can be produced using SVPWM without entering overmodulation is:
@@ -7778,7 +7778,7 @@ The inverse Park transform rotates the voltage vector without changing its magni
 Here, $v_d^*$ and $v_q^*$ denote the total voltage commands, including both PI feedback and feedforward components. Because both axes share the available inverter voltage, their limits cannot be treated independently. A straight forward approach is to scale both voltage components by the same factor when the commanded voltage exceeds the maximum:
 
 \begin{equation}
-    |\mathbf{V}_s| = \sqrt{(v_d^*)^2 + (v_q^*)^2}
+    |\mathbf{V}_s|^* = \sqrt{(v_d^*)^2 + (v_q^*)^2}
 \end{equation}
 
 The scaling factor is:
@@ -7786,9 +7786,9 @@ The scaling factor is:
 \begin{equation}
     \gamma =
     \begin{cases}
-        1, & V^* \leq V_{\max} \\[4pt]
-        \displaystyle\frac{V_{\max}}{V^*},
-        & V^* > V_{\max}
+        1, & |\mathbf{V_s}|^* \leq |\mathbf{V_s}|_{\max} \\[4pt]
+        \displaystyle\frac{|\mathbf{V_s}|_{\max}}{|\mathbf{V_s}|^*},
+        & |\mathbf{V_s}|^* > |\mathbf{V_s}|_{\max}
     \end{cases}
 \end{equation}
 
@@ -7854,7 +7854,18 @@ Integral clamping imposes upper and lower bounds on the integral contribution:
     x_{j,min} \leq x_j \leq x_{j,max}
 \end{equation}
 
-At each integration step, the total integral contribution is compared with the upper and lower limits. If either limit is exceeded, the integral state is constrained to the permitted range, either the maximum or minimum. Therefore, once the integral contribuiton reaches a bound, further accumulation in that direction is prevented. An error of the opposite sign allows the integral contribution to move away from the bound.
+At each integration step, the total integral contribution is compared with the upper and lower limits. If either limit is exceeded, the integral state is constrained to the permitted range, either the maximum or minimum:
+
+\begin{equation}
+    x_j = 
+    \begin{cases}
+        x_{j,\max}, & x_j > x_{j,\max} \\
+        x_{j,\min}, & x_j < x_{j,\min} \\
+        x_j, & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+Therefore, once the integral contribuiton reaches a bound, further accumulation in that direction is prevented. An error of the opposite sign allows the integral contribution to move away from the bound.
 
 While this method is simply and prevents unbounded accumulation, it does not directly represent the voltage currently available to the controller. The total command also contains proportional and feedforward contributions, and the two axes share a voltage-vector limit. Consequently, the total voltage can saturate before an integral bound is reached, or an overly restrictive bound can prevent the controller from supplying a necessary steady-state voltage. Thus integrator clamping tends to be more of a mitigation technique rather than a complete solution.
 
@@ -7884,14 +7895,75 @@ For a controller with upper and lower output limits, where $x$ is the integral s
 \paragraph{Back-Calculation}
 %=========================================================================%
 
-Back-calcualtion dynamically forces the integrator to reset itself when an actuator saturates. Instead of just turning the integrator off (like clamping), it monitors the gap between what hte controller "wants" to do and what the actuator can do, using that error to wind down the integral term. First, the controller calculates its output as normal
+Back-calcualtion dynamically forces the integrator to adjust its integral state when an actuator saturates. Instead of just turning the integrator off (like clamping), it monitors the gap between the controller command and actuator limits, using the error to wind down the integral term. First, the controller calculates its output, $v_{dq}^*$, as normal:
+
+\begin{align}
+    v_d^* = K_{p,d}e_d + x_d + v_{d,ff}, \\
+    v_q^* = K_{p,q}e_q + x_q + v_{q,ff}
+\end{align}
+
+Where $x_j$ denotes the integral term:
 
 \begin{equation}
-    \Delta v_d = v_{d,sat}^* - v_d^* \\
+    x_j = K_i\int_{t_0}e_j \space dt, \qquad j \in \{d,q\}
+\end{equation}
+
+Such that:
+
+\begin{equation}
+    \frac{dx_j}{dt} = K_ie_j
+\end{equation}
+
+Then, the voltage limiting per Section \ref{sec:voltage-vector-saturation} is applied. If $|\mathbf{V}_s^*| \leq |\mathbf{V}_s|_{max}$, the command passes through unchanged. Recall the requested magnitude is calculated as:
+
+\begin{equation}
+    |\mathbf{V}_s|^* = \sqrt{(v_d^*)^2 + (v_q^*)^2}
+\end{equation}
+
+During saturation, the voltage vector magnitude is limited to $|\mathbf{V}_s|_{\max}$, while its individual components depend on the requested phase:
+
+\begin{equation}
+    \gamma =
+    \begin{cases}
+        1, & |\mathbf{V_s}|^* \leq |\mathbf{V_s}|_{\max} \\[4pt]
+        \displaystyle\frac{|\mathbf{V_s}|_{\max}}{|\mathbf{V_s}|^*},
+        & |\mathbf{V_s}|^* > |\mathbf{V_s}|_{\max}
+    \end{cases}
+\end{equation}
+
+\begin{equation}
+    v_{d,sat}^* = \gamma v_d^*, \qquad
+    v_{q,sat}^* = \gamma v_q^*
+\end{equation}
+
+Next, the saturation differences are calcualted as the difference between the saturated (limited) output and the commanded output pre-voltage limiting. When no voltage limiting occurs, and the commanded voltage is within range of the inverter capabilities, these differences are set to zero. 
+
+\begin{equation}
+    \Delta v_d = v_{d,sat}^* - v_d^*, \qquad
     \Delta v_q = v_{q,sat}^* - v_q^*
 \end{equation}
 
+Finally, the integral states are updated by adding the saturation differences multiplied by a gain to the integral state. Specifically:
 
+\begin{equation}
+    x_j = x_j(t_0) + \int_{t_0}^t K_{i,j}e_j(\tau) + K_{w,j}\Delta v_j(\tau) \space d\tau
+\end{equation}
+
+In discrete time, using a forward-Euler update with control period, $T_s$:\
+
+\begin{equation}
+    x_j[k + 1] = x_j[k] + T_s(K_{i,j}e_j[k] + K_{w,j}\Delta v_j[k])
+\end{equation}
+
+Where $K_{w,j}$ is the back-calculation gain. It determins how strongly the voltage-limiting error corrects the integral state. It has units of $s^{-1}$, with an associated tracking time of:
+
+\begin{equation}
+    T_{t,j} = \frac{1}{K_{w,j}}
+\end{equation}
+
+Thus a larger gain produces a stronger correction and shorter tracking time. The integral state accumulates both the current error and a correction proportional to the difference between the limited and commanded voltages. When no saturation occurs, this difference is zero, and th ordinary PI integration is recovered. During saturation, the correction opposes the excessive voltage request, reducing further the integral accumulation, or unwinding the exisiting integral contribution.
+
+For example, if the voltage vector is saturated in the positive direction, the saturation difference will be negative. In this case, we amplify this difference by some gain, $K_w$, and then add this to the accumulated integral term. Since difference is negative, this reduces the integral accumulation, dynamically preventing integral winding as a function of how saturated the system is. 
 
 
 
