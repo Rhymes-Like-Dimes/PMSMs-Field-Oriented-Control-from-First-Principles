@@ -7874,7 +7874,7 @@ While this method is simply and prevents unbounded accumulation, it does not dir
 \paragraph{Conditional Integration}
 %=========================================================================%
 
-Conditional integration determines whether an integral update should be applied based on the saturation condition and the direction of the proposed update. When the voltage command is achievable, integration proceeds normally. When saturation occurs, integration is suspended if it would drive the command further into saturation. Integration is permitted if it would help bring the command back toward the achievable region.
+The limitations of integral claming naturally lead to conditional integration. Conditional integration determines whether an integral update should be applied based on the saturation condition and the direction of the proposed update. When the voltage command is achievable, integration proceeds normally. When saturation occurs, integration is suspended if it would drive the command further into saturation. Integration is permitted if it would help bring the command back toward the achievable region.
 
 For a controller with upper and lower output limits, where $x$ is the integral state:
 
@@ -7886,6 +7886,38 @@ For a controller with upper and lower output limits, where $x$ is the integral s
         K_ie, & \text{otherwise}
     \end{cases}
 \end{equation}
+
+Which appears near identical to integral clamping. The difference is that instead of setting an arbitrary clamping value, we evaluate the state of the commanded voltage vector in relation to the inverter limits. When the voltage vector is saturated, integration is suspended if it would push the command further beyond the limit. Integration is still permitted if it would bring the command back within available range. To implement conditional integration, the total requested voltage is first calculated as normal:
+
+\begin{align}
+    v_d^* = K_{p,d}e_d + x_d + v_{d,ff}, \\
+    v_q^* = K_{p,q}e_q + x_q + v_{q,ff}
+\end{align}
+
+Where $x_j$ denotes the integral term:
+
+\begin{equation}
+    x_j = K_i\int_{t_0}e_j \space dt, \qquad j \in \{d,q\}
+\end{equation}
+
+Such that:
+
+\begin{equation}
+    \frac{dx_j}{dt} = K_ie_j
+\end{equation}
+
+If the magntiude exceeds $|\mathbf{V}_s|_{\max}$, we apply the voltage limiter per Section \ref{sec:voltage-vector-saturation}. This yields $v_{d,sat}^*$ and $v_{q,sat}^*$. Next, for each axis, we calculate the difference between saturated and pre-limited commands:
+
+\begin{equation}
+    \Delta v_j = v_{j,sat}^* - v_j^*
+\end{equation}
+
+Then compare its sign with the current error:
+
+\begin{list}
+    If $\Delta v_j < 0$, the limter reduced that component. A positive error would integrate it upward fruther, so freeze the integrator.
+\end{list}
+
 
 
 
@@ -7961,7 +7993,7 @@ Where $K_{w,j}$ is the back-calculation gain. It determins how strongly the volt
     T_{t,j} = \frac{1}{K_{w,j}}
 \end{equation}
 
-Thus a larger gain produces a stronger correction and shorter tracking time. The integral state accumulates both the current error and a correction proportional to the difference between the limited and commanded voltages. When no saturation occurs, this difference is zero, and th ordinary PI integration is recovered. During saturation, the correction opposes the excessive voltage request, reducing further the integral accumulation, or unwinding the exisiting integral contribution.
+Thus a larger gain produces a stronger correction and shorter tracking time. The integral state accumulates both the current error and a correction proportional to the difference between the limited and commanded voltages. When no saturation occurs, this difference is zero, and ordinary PI integration is recovered. During saturation, the correction opposes the excessive voltage request, reducing further the integral accumulation, or unwinding the exisiting integral contribution.
 
 For example, if the voltage vector is saturated in the positive direction, the saturation difference will be negative. In this case, we amplify this difference by some gain, $K_w$, and then add this to the accumulated integral term. Since difference is negative, this reduces the integral accumulation, dynamically preventing integral winding as a function of how saturated the system is. 
 
