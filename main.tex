@@ -7874,7 +7874,7 @@ While this method is simply and prevents unbounded accumulation, it does not dir
 \paragraph{Conditional Integration}
 %=========================================================================%
 
-The limitations of integral claming naturally lead to conditional integration. Conditional integration determines whether an integral update should be applied based on the saturation condition and the direction of the proposed update. When the voltage command is achievable, integration proceeds normally. When saturation occurs, integration is suspended if it would drive the command further into saturation. Integration is permitted if it would help bring the command back toward the achievable region.
+The limitations of integral clamping naturally lead to conditional integration. Conditional integration determines whether an integral update should be applied based on the saturation condition and the direction of the proposed update. When the voltage command is achievable, integration proceeds normally. When saturation occurs, integration is suspended if it would drive the command further into saturation. Integration is permitted if it would help bring the command back toward the achievable region.
 
 For a controller with upper and lower output limits, where $x$ is the integral state:
 
@@ -7914,13 +7914,21 @@ If the magntiude exceeds $|\mathbf{V}_s|_{\max}$, we apply the voltage limiter p
 
 Then compare its sign with the current error:
 
-\begin{list}
-    If $\Delta v_j < 0$, the limter reduced that component. A positive error would integrate it upward fruther, so freeze the integrator.
-\end{list}
+\begin{enumerate}
+    \item If $\Delta v_j < 0$, the limiter reduced the commanded voltage. Therefore, the original command exceeded the inverters upper limit, and a positive error would further increase saturation. Hence we freeze the integrator.
+    \item If $\Delta v_j > 0$, the limiter increased the commanded voltage toward zero. Therefore, the original command was below the inverters lower limit (zero), and a negative error would further increase the system into saturation. Hence we freezed the integrator.
+    \item Otherwise, allow integration.
+\end{enumerate}
 
+Both blocking conditions can be written compactly as:
 
+\[
+    e_j\Delta v_j < 0 \rightarrow \text{freeze the integrator}
+\]
 
+Using this rule, we decide when to apply integral control. For example, if the $q$-axis requests 20 V, is limited to 15 V, and has a positive current error (i.e the actaul current is lower than the commanded current), integration is frozen. If the error becomes negative (i.e the commanded current exceeds the reference), integration resumes and helps drive the system out of saturation.
 
+Thus, conditional integration prevents further accumulation when integral action would worsen saturation and considers the actual inverter limits. However, it does not actively correct an excessive integral state. Back-calculation addresses this limitation by using the difference bewteen the commanded and limited voltages to continuously adjust the integral contribution.
 
 
 %=========================================================================%
