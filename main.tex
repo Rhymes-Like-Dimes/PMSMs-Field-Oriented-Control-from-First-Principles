@@ -8005,13 +8005,27 @@ Thus a larger gain produces a stronger correction and shorter tracking time. The
 
 For example, if the voltage vector is saturated in the positive direction, the saturation difference will be negative. In this case, we amplify this difference by some gain, $K_w$, and then add this to the accumulated integral term. Since difference is negative, this reduces the integral accumulation, dynamically preventing integral winding as a function of how saturated the system is. 
 
+The voltage limiter and anti-windup feedback can now be incorporated inot the FOC structure, as shown in Figure \ref{fig:foc-block-diagram-v3}. The limiter acts on the total $dq$-axis voltage commands after feedforward compensation, while any anti-integral windup method can be used to prevent oscillation and instability due to integral accumulation.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        keepaspectratio
+    ]{foc-block-diagram-v3.pdf}
+
+    \caption{Field Oriented Control Block Diagram with Voltage Limiting \& Anti-Windup}
+    \label{fig:foc-block-diagram-v3}
+\end{figure}
+
+
+%=========================================================================%
+\subsection{Torque, Velocity, and Position Control}
+\label{sec:torque-velocity-position-control}
+%=========================================================================%
 
 
 
-
--3.3.1 Voltage Vector Saturation
--3.3.2 PI Integrator Windup
--3.3.3 Anti-Windup Strategies
 
 -3.4 Cascaded Torque, Velocity, and Position Control
 -3.4.1 Torque Control

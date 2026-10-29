@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="646" height="390" viewBox="0 0 646 390">
+<title>Three-phase inverter bridge</title>
+<desc>Vector recreation of the supplied inverter schematic, with a transparent background.</desc>
+<g fill="none" stroke="#000" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M36 38H526V74 M36 342H526V305 M103 38V181 M83 181H123 M83 191H123 M103 191V342"/>
+
+<path d="M215 38V74 M215 154V226 M215 305V342 M215 189H314"/>
+<g transform="translate(215 74)">
+<path d="M0 0V11L-24 27 M-24 15V62 M-24 53L0 69V80 M0 0H33V29 M33 47V80H0 M23 29H43"/>
+<path d="M33 29L22 47H44Z" fill="#000" stroke="none"/>
+<path d="M-13 57L-16 66L-3 68Z" fill="#000" stroke="none"/>
+</g>
+<g transform="translate(215 226)">
+<path d="M0 0V11L-24 27 M-24 15V62 M-24 53L0 69V80 M0 0H33V29 M33 47V80H0 M23 29H43"/>
+<path d="M33 29L22 47H44Z" fill="#000" stroke="none"/>
+<path d="M-13 57L-16 66L-3 68Z" fill="#000" stroke="none"/>
+</g>
+<path d="M359 38V74 M359 154V226 M359 305V342 M359 189H464"/>
+<g transform="translate(359 74)">
+<path d="M0 0V11L-24 27 M-24 15V62 M-24 53L0 69V80 M0 0H33V29 M33 47V80H0 M23 29H43"/>
+<path d="M33 29L22 47H44Z" fill="#000" stroke="none"/>
+<path d="M-13 57L-16 66L-3 68Z" fill="#000" stroke="none"/>
+</g>
+<g transform="translate(359 226)">
+<path d="M0 0V11L-24 27 M-24 15V62 M-24 53L0 69V80 M0 0H33V29 M33 47V80H0 M23 29H43"/>
+<path d="M33 29L22 47H44Z" fill="#000" stroke="none"/>
+<path d="M-13 57L-16 66L-3 68Z" fill="#000" stroke="none"/>
+</g>
+<path d="M526 38V74 M526 154V226 M526 305V342 M526 189H628"/>
+<g transform="translate(526 74)">
+<path d="M0 0V11L-24 27 M-24 15V62 M-24 53L0 69V80 M0 0H33V29 M33 47V80H0 M23 29H43"/>
+<path d="M33 29L22 47H44Z" fill="#000" stroke="none"/>
+<path d="M-13 57L-16 66L-3 68Z" fill="#000" stroke="none"/>
+</g>
+<g transform="translate(526 226)">
+<path d="M0 0V11L-24 27 M-24 15V62 M-24 53L0 69V80 M0 0H33V29 M33 47V80H0 M23 29H43"/>
+<path d="M33 29L22 47H44Z" fill="#000" stroke="none"/>
+<path d="M-13 57L-16 66L-3 68Z" fill="#000" stroke="none"/>
+</g>
+</g><g fill="#000">
+<ellipse cx="36" cy="38" rx="5.8" ry="4.8"/>
+<ellipse cx="103" cy="38" rx="5.8" ry="4.8"/>
+<ellipse cx="215" cy="38" rx="5.8" ry="4.8"/>
+<ellipse cx="359" cy="38" rx="5.8" ry="4.8"/>
+<ellipse cx="36" cy="342" rx="5.8" ry="4.8"/>
+<ellipse cx="103" cy="342" rx="5.8" ry="4.8"/>
+<ellipse cx="215" cy="342" rx="5.8" ry="4.8"/>
+<ellipse cx="359" cy="342" rx="5.8" ry="4.8"/>
+<ellipse cx="215" cy="189" rx="5.8" ry="4.8"/>
+<ellipse cx="359" cy="189" rx="5.8" ry="4.8"/>
+<ellipse cx="526" cy="189" rx="5.8" ry="4.8"/>
+<ellipse cx="314" cy="189" rx="5.8" ry="4.8"/>
+<ellipse cx="464" cy="189" rx="5.8" ry="4.8"/>
+<ellipse cx="628" cy="189" rx="5.8" ry="4.8"/>
+</g></svg>
