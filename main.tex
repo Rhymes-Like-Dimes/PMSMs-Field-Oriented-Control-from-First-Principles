@@ -17,6 +17,7 @@
 \usepackage{caption, subcaption}  % Multiple figures
 \usepackage{float}                % Figure placement
 \usepackage{pdflscape}            % Landscape pages
+\usepackage{pdfpages}             % Include PDF pages
 
 \usepackage{tikz}                 % Simple diagrams
 \usetikzlibrary{positioning}      % circuitz positioning
@@ -44,6 +45,27 @@
   {0pt}
   {1.5ex plus .2ex}
   {0.8ex}
+
+
+% --------------------------------------------------
+% PDF Page Formatting
+% --------------------------------------------------
+
+\newcommand{\FOCPageOverlay}{%
+    \thispagestyle{empty}%
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south,yshift=12mm]
+            at (current page.south) {%
+                \begin{minipage}{0.9\paperwidth}
+                    \captionof{figure}{Cascaded Torque, Velocity,
+                    and Position Control Structure}
+                    \label{fig:foc-block-diagram-v4}
+                \end{minipage}%
+            };
+        \node[anchor=south,yshift=4mm]
+            at (current page.south) {\thepage};
+    \end{tikzpicture}%
+}
 
 
 % --------------------------------------------------
@@ -7746,7 +7768,7 @@ Applying this result independently to the $d$- and $q$-axis controllers, with th
     \end{aligned}
 \end{equation}
 
-For a nonsalient machine wiht $L_d = L_q$, the two controllers are indentical. In practice, this response depends on the accuracy of the motor parameters and feedforward compensation, and is affected by sampling and computational delays. The available inverter voltage also limits how quickly the current can change. Consequently, the bandwidth cannot be increased arbitrarily. Next, we examine the effects of voltage saturation and the anti-windup measures required when the commanded voltage exceeds the inverter's available output.
+For a nonsalient machine wiht $L_d = L_q$, the two controllers are indentical. In practice, this response depends on the accuracy of the motor parameters and feedforward compensation, and is affected by sampling and computational delays. The available inverter voltage also limits how quickly the current can change. Consequently, the bandwidth cannot be increased arbitrarily. Next, we examine the effects of voltage saturation and the anti-windup measures required when the commanded voltage exceeds the inverter's available output. For a conventional FOC implementation, the current loop bandwidth is typically selected to be between 1/10 and 1/5 of the electrical switching frequency. This ensures that the current loop can respond quickly to changes in the reference, while remaining stable and avoiding excessive overshoot or oscillation.
 
 %=========================================================================%
 \subsection{Voltage Limitations \& Anti-Windup}
@@ -8014,7 +8036,7 @@ The voltage limiter and anti-windup feedback can now be incorporated inot the FO
         keepaspectratio
     ]{foc-block-diagram-v3.pdf}
 
-    \caption{Field Oriented Control Block Diagram with Voltage Limiting \& Anti-Windup}
+    \caption{Field Oriented Control with Voltage Limiting and Anti-Windup}
     \label{fig:foc-block-diagram-v3}
 \end{figure}
 
@@ -8024,8 +8046,137 @@ The voltage limiter and anti-windup feedback can now be incorporated inot the FO
 \label{sec:torque-velocity-position-control}
 %=========================================================================%
 
-Many motor applications required control of speed position or torque, rather than just current. These objectives can be achieved using a cascaded control structure: the position controller generates a velocity reference, the velocity controller generates a torque reference, and the current controllers regulate the currents required to produce the desired torque. Each inner loop must respond faster than  the outer loop, allowing the controllers to be designed sequentially from current control outward to position control.
+Many motor applications require control of speed, position or torque, rather than just current. These objectives can be achieved using a cascaded control structure: the position controller generates a velocity reference, the velocity controller generates a torque reference, and the current controllers regulate the currents required to produce the desired torque. Each inner loop must respond faster than  the outer loop, allowing the controllers to be designed sequentially from current control outward to position control.
 
+\includepdf[
+    pages=1,
+    fitpaper=true,
+    templatesize={280mm}{110mm},
+    scale=0.85,
+    pagecommand={\FOCPageOverlay}
+]{foc-block-diagram-v4.pdf}
+
+Figure \ref{fig:foc-block-diagram-v4} shows the resulting cascaded control structure. Torque control is implemented by supply a torque refernce directly at $T_e^*$, bypassing the position and velocity controllers. Likewise, is position control is not desired, velocity control can be implemented by supplying a velocity reference directly at $\omega_m^*$, bypassing the position controller. Torque control is therefore a special case of velocity control, which is itself a special case of position control. In any case, if the next out loop is not required, a reference can instead be supplied directly to the inner loop, and the outer PI controllers and supporting blocks can be omitted.
+
+
+%=========================================================================%
+\subsubsection{Torque Control}
+\label{sec:torque-control}
+%=========================================================================%
+
+For a PMSM, electromagntic torque is determined by the stator current components in the rotating reference frame:
+
+\begin{equation}
+    T_e = \frac{3}{2}p\left[\lambda_mi_q + (L_d - L_q)i_di_q\right]
+\end{equation}
+
+Where $p$ is the number of pole pairs, $\lambda_m$ is the permanent magnet flux linkage, and $L_d$ and $L_q$ are the $d$- and $q$-axis inductances. For the nonsalient machine considered here, $L_d = L_q$, the torque equation simplifies to:
+
+\begin{equation}
+    T_e = \frac{3}{2}p\lambda_mi_q = K_ti_q
+\end{equation}
+
+Where $K_t$ is the motor torque constant. Consequently, a desired torque reference can be converted to a $q$-axis current reference using:
+
+\begin{equation}
+    i_q^* = \frac{T_e^*}{K_t}
+\end{equation}
+
+The $q$-axis controller then regulates the current required to produce this torque. A separate PI controller is therefore unncessary: torque regulation is acheived through current feedback and the realtionship between torque and $q$-axis current. The $d$-axis current is typically set to zero, which maximizes the torque per ampere and minimizes copper losses as $d$-axis current does not contribute to torque production. Later, we will see that $d$-axis current can be used to produce field weakening, increasing the maximum speed of the motor at the expense of torque.
+
+With a constant torque constant, the torque reference response follows closed loop current dynamics. Using the current controller design from Section \ref{sec:pi-current-controller-design}:
+
+\begin{equation}
+    \frac{T_e(s)}{T_e^*(s)} = \frac{I_q(s)}{I_q^*(s)} = \frac{\omega_{c}}{s+\omega_{c}}, \qquad \omega_c = \frac{K_{p,q}}{L_q}
+\end{equation}
+
+Where $\omega_c$ is the selected current loop bandwidth. Recall this approach assumes effective axis decoupling, accurate motor parameters, and operation within the available inverter limits. Torque loop tuning therefore reduces to the current controler tuning already established.
+
+
+%=========================================================================%
+\subsubsection{Velocity Control}
+\label{sec:velocity-control}
+%=========================================================================%
+
+Torque control determines the electromagnetic torque produced by the motor, which is related to the mechanical speed through the motor's mechanical dynamics and load. To regulate speed, an outer velocity controller adjusts the torque reference according to the difference between the desired and measured mechanical speed.
+
+\begin{equation}
+    e_\omega = \omega_m^* - \omega_m
+\end{equation}
+
+A PI controller is used to generate the torque reference:
+
+\begin{equation}
+    T_e^* = K_{p,\omega}e_\omega + K_{i,\omega}\int e_\omega \space dt
+\end{equation}
+
+The proportional term provides an immediate response to speed error, while the integral term adjusts the sustained torque required to overcome load torque and mechanical losses. Provided sufficient torque is available and the closed-loop system is stable, integral action eliminates steady-state speed error for a constant reference and constant load torque.
+
+The mechanical dynamics of the motor follow Newton's second law for rotation: the net torque acting on the rotor is equal to the product of the moment of inertia and the angular acceleration. Electromagntic torque drives the rotor, while load torque and friction oppose its motion:
+
+\begin{equation}
+    J\frac{d\omega_m}{dt} = T_e - T_L - B\omega_m
+\end{equation}
+
+Where $J$ is the combined motor and load intertia, $T_e$ is the motor torque and $T_L$ is the opposing load torque. Approximating friction as a viscous damping term, the friction torque is proportional to speed, with $B$ as the viscous damping coefficient. Taking the Laplace transform:
+
+\begin{equation}
+    sJ\Omega_m(s) = T_e(s) - T_L(s) - B\Omega_m(s)
+\end{equation}
+
+Rearranging terms gives the transfer function from torque to speed:
+
+\begin{equation}
+    G_\omega(s) = \frac{\Omega_m(s)}{T_e(s)} = \frac{1}{Js+B}
+\end{equation}
+
+The inner current loop introduces additional dynamics between commanded and actual torque. However, if the velocity loop is designed to respond sufficiently more slowly than the current loop, torque tracking can be approximated as ideal over the frequency range relevant to velocity control:
+
+\begin{equation}
+    T_e(s)\approx T_e^*(s)
+\end{equation}
+
+Using this approximation, the velocity controller can be designed directly around the mechanical plant. With the PI controller:
+
+\begin{equation}
+    C_\omega(s) = K_{p\omega} + \frac{K_{i\omega}}{s}
+\end{equation}
+
+In line with the typical closed loop transfer function shown in Section \ref{sec:pi-current-controller-design}, the closed-loop reference transfer function becomes:
+
+\begin{equation}
+    \frac{\Omega_m(s)}{\Omega_m^*(s)} = \frac{C_\omega(s)G_\omega(s)}{1+C_\omega(s)G_\omega(s)}
+\end{equation}
+
+Since the plant and controller share identical forms to the current controller devloped earlier, the algebra is omitted here. Substituting the plant and controller transfer functions, the closed-loop transfer function is:
+
+\begin{equation}
+    \frac{\Omega_m(s)}{\Omega_m^*(s)} = \frac{K_{p\omega} + K_{i\omega}/s}{Js^2 + (B + K_{p\omega})s + K_{i\omega}}
+\end{equation}
+
+Dividing the denominator by $J$ gives the characteristic polynomial:
+
+\begin{equation}
+    s^2 + \frac{B+K_{p\omega}}{J}s + \frac{K_{i\omega}}{J}
+\end{equation}
+
+The controller gains can therefore be selected by matching these coefficients to a desired second-order characteristic polynomial:
+
+\begin{equation}
+    s^2 + 2\zeta_\omega\omega_{n\omega}s + \omega_{n\omega}^2
+\end{equation}
+
+Where $\zeta_\omega$ is the desired damping ratio and $\omega_{n\omega}$ is the desired natural frequency. Equating coefficients yields:
+
+\begin{equation}
+    K_{p\omega} = 2\zeta_\omega\omega_{n\omega}J-B, \qquad
+    K_{i\omega} = J\omega_{n\omega}^2
+\end{equation}
+
+Increasing $\omega_{n\omega}$ generally produces a faster response and requires larger controller gains. The damping ratio determines the character of the closed-loop poles, with values below unity producing an underdamped pole pair and unity producing repeated real poles. These choices specify the denominator dynamics; the controller zero at $s=-K_{i\omega}/K_{p\omega}$ also influences the reference response, so the usual second-order overshoot expressions do not apply directly.
+
+
+%=========================================================================%
 
 -3.4 Cascaded Torque, Velocity, and Position Control
 -3.4.1 Torque Control
