@@ -8175,6 +8175,53 @@ Where $\zeta_\omega$ is the desired damping ratio and $\omega_{n\omega}$ is the 
 
 Increasing $\omega_{n\omega}$ generally produces a faster response and requires larger controller gains. The damping ratio determines the character of the closed-loop poles, with values below unity producing an underdamped pole pair and unity producing repeated real poles. These choices specify the denominator dynamics; the controller zero at $s=-K_{i\omega}/K_{p\omega}$ also influences the reference response, so the usual second-order overshoot expressions do not apply directly.
 
+The selected response speed must preserve sufficient separation from the current loop bandwidth. Otherwise, the assumption of ideal torque tracking becomes inaccurate, and the velocity loop may become unstable. A typical design guideline is to select the velocity loop bandwidth to be between 1/10 and 1/5 of the current loop bandwidth. This ensures that the inner current loop can respond quickly to changes in the torque reference, while maintaining stability and avoiding excessive overshoot or oscillation in the velocity response.
+
+To aquire mechanical speed feedback, a rotor position sensor can be used to measure the rotor angle, $\theta_m$. The mechanical speed can then be estiamted from the change in angle between successive samples:
+
+\begin{equation}
+    \omega_m \approx \frac{\Delta\theta_m[k]}{T_{s,\mathrm{est}}}
+\end{equation}
+
+Where $T_{s,\mathrm{est}}$ is the time between samples. While this method is simple, differentiating the position signal amplifies noise. At low speeds, the position sensor may remain unchanged for several samples, then advance by one count, producing a series of zero estimates and spikes even at steady speed. A low pass filter can smooth the estimate before it is fed back to the velocity PI. The filter also adds phase lag, so its cutoff should be high enough to preserve the desired velocity loop response. For a first order low pass filter, the cutt off should be selected to be 5-10 times higher than the velocity loop bandwidth.
+
+
+%=========================================================================%
+\subsubsection{Position Control}
+\label{sec:position-control}
+%=========================================================================%
+
+The position controller moves the rotor to a desired mechanical angle by generating a refernce for the inner velocity loop. A proportional controller is typically sufficient for position control, as the inner velocity and current loops provide integral action to eliminate steady-state error. The position error is defined as:
+
+\begin{equation}
+    e_\theta = \theta_m^* - \theta_m, \qquad
+    \omega_m^* = K_{p\theta}e_\theta
+\end{equation}
+
+A large position error produces a large velocity reference, which commands and large torque reference, which commands a large current reference. The inner loops then regulate the current to produce the torque required to accelerate the rotor toward the desired position. As the position error decreases, the velocity reference is reduced, and the rotor slows as it approaches the target angle. The proportional gain determines how aggressively the position controller responds to error, and must be selected to avoid overshoot or oscillation.
+
+Mechanical position is the integral of mechanical velocity. With zero initial conditions:
+
+\begin{equation}
+    \frac{d\theta_m}{dt} = \omega_m 
+    \qquad \longrightarrow \qquad
+    \Theta_m(s) = \frac{\Omega_m(s)}{s}
+\end{equation}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 %=========================================================================%
 
@@ -8225,3 +8272,4 @@ Increasing $\omega_{n\omega}$ generally produces a faster response and requires 
 %Working notes
 1. Appendix
 -Fourier derivation to show that for any arbitrary balanced 3 phase quantity, the sum is zero if and only if it contains no zero sequence component
+2. Fix cascaded control structure block diagram to show position controller as proportional only
